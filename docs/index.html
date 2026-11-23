@@ -321,7 +321,7 @@
             <div>
               <p id="berandaDateLabel" class="text-[11px] font-medium text-emerald-200 uppercase tracking-wider mb-1">-</p>
               <h2 class="text-xl font-bold leading-tight">Halo, <span id="berandaGreetingName" class="text-amber-300">Pengguna</span>! 👋</h2>
-              <p class="text-xs text-emerald-100 mt-1">Selamat datang kembali di sistem SIPETA MITRA.</p>
+              <p class="text-xs text-emerald-100 mt-1">Selamat datang kembali di SIPETA MITRA.</p>
             </div>
             <div class="flex items-center gap-2 self-start sm:self-center">
               <span class="text-xs font-semibold px-3 py-1.5 bg-white/15 backdrop-blur rounded-xl border border-white/20" id="berandaGreetingRole">ROLE</span>
@@ -448,11 +448,15 @@
 
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Ringkasan Operasional</h1>
-              <p class="text-xs sm:text-sm text-slate-500">Status data registrasi mitra dan lahan aktif di cakupan akses Anda</p>
+              <h1 id="dashPageTitle" class="text-xl sm:text-2xl font-bold text-slate-900">Ringkasan Operasional</h1>
+              <p id="dashPageSubtitle" class="text-xs sm:text-sm text-slate-500">Status data registrasi mitra dan lahan aktif di cakupan akses Anda</p>
             </div>
-            <div class="flex items-center gap-2 self-start sm:self-auto">
-              <select id="filterDashboardTrader" onchange="window.SIPETA.renderDashboard()" class="text-xs px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none hidden">
+            <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              <select id="filterDashboardView" onchange="window.SIPETA.renderDashboard()" class="text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                <option value="RINGKASAN_OPERASIONAL">Ringkasan Operasional</option>
+                <option value="KINERJA_ORGANISASI">Kinerja Organisasi</option>
+              </select>
+              <select id="filterDashboardTrader" onchange="window.SIPETA.renderDashboard()" class="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm focus:outline-none hidden">
                 <option value="">Semua Trader</option>
               </select>
               <button type="button" onclick="window.SIPETA.loadDashboardData()" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold rounded-lg shadow-sm flex items-center gap-2">
@@ -462,121 +466,232 @@
             </div>
           </div>
 
-          <!-- METRICS CARDS -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="dashboardMetrics">
-            <!-- Koordinator Card -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Koordinator</span>
-                <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm"><i class="fa-solid fa-users"></i></span>
+          <!-- ==================== VIEW A: RINGKASAN OPERASIONAL ==================== -->
+          <div id="dashViewOperasional" class="space-y-6">
+            <!-- KARTU NAVIGASI TAHAPAN (MENYAMPING & BISA DIKLIK) -->
+            <div class="flex gap-2.5 overflow-x-auto pb-1.5" id="dashStageTabs">
+              <button type="button" data-dash-stage="registrasi" class="dash-stage-card flex-none min-w-[165px] sm:flex-1 flex items-center gap-3 px-3.5 py-3 rounded-2xl border bg-emerald-600 text-white border-emerald-600 shadow-sm text-left transition cursor-pointer">
+                <span class="dash-stage-icon w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center text-sm flex-none">
+                  <i class="fa-solid fa-address-card"></i>
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-bold leading-tight truncate">Tahap Registrasi</span>
+                  <span class="dash-stage-sub block text-[10px] text-emerald-100 mt-0.5">Data Aktif</span>
+                </div>
+              </button>
+
+              <button type="button" data-dash-stage="verif_lahan" class="dash-stage-card flex-none min-w-[165px] sm:flex-1 flex items-center gap-3 px-3.5 py-3 rounded-2xl border bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 shadow-xs text-left transition cursor-pointer">
+                <span class="dash-stage-icon w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm flex-none">
+                  <i class="fa-solid fa-clipboard-check"></i>
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-bold leading-tight truncate">Verifikasi Lahan</span>
+                  <span class="dash-stage-sub block text-[10px] text-amber-600 font-semibold mt-0.5">On Progress</span>
+                </div>
+              </button>
+
+              <button type="button" data-dash-stage="verif_admin" class="dash-stage-card flex-none min-w-[165px] sm:flex-1 flex items-center gap-3 px-3.5 py-3 rounded-2xl border bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 shadow-xs text-left transition cursor-pointer">
+                <span class="dash-stage-icon w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm flex-none">
+                  <i class="fa-solid fa-user-check"></i>
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-bold leading-tight truncate">Verifikasi Admin</span>
+                  <span class="dash-stage-sub block text-[10px] text-amber-600 font-semibold mt-0.5">On Progress</span>
+                </div>
+              </button>
+
+              <button type="button" data-dash-stage="verif_varietas" class="dash-stage-card flex-none min-w-[165px] sm:flex-1 flex items-center gap-3 px-3.5 py-3 rounded-2xl border bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 shadow-xs text-left transition cursor-pointer">
+                <span class="dash-stage-icon w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm flex-none">
+                  <i class="fa-solid fa-seedling"></i>
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-bold leading-tight truncate">Verifikasi Varietas</span>
+                  <span class="dash-stage-sub block text-[10px] text-amber-600 font-semibold mt-0.5">On Progress</span>
+                </div>
+              </button>
+
+              <button type="button" data-dash-stage="final_mitra" class="dash-stage-card flex-none min-w-[165px] sm:flex-1 flex items-center gap-3 px-3.5 py-3 rounded-2xl border bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 shadow-xs text-left transition cursor-pointer">
+                <span class="dash-stage-icon w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-sm flex-none">
+                  <i class="fa-solid fa-award"></i>
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-bold leading-tight truncate">Final Mitra</span>
+                  <span class="dash-stage-sub block text-[10px] text-amber-600 font-semibold mt-0.5">On Progress</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- PANEL 1: TAHAP REGISTRASI -->
+            <div id="dashStage_registrasi" class="dash-stage-panel space-y-4 fade-in">
+
+              <!-- 4 METRICS CARDS (ANGKA) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- 1. Koordinator Aktif -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Koordinator Aktif</span>
+                    <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm"><i class="fa-solid fa-users"></i></span>
+                  </div>
+                  <div class="mt-3 flex items-baseline gap-2">
+                    <span id="dashAktifKoordinator" class="text-2xl font-bold text-slate-900">0</span>
+                    <span class="text-xs text-slate-400">orang</span>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap justify-between gap-1 text-[11px] text-slate-500">
+                    <span>Petani: <strong id="dashKoorPetani" class="text-emerald-600">0</strong></span>
+                    <span>Semi Bakul: <strong id="dashKoorSemiBakul" class="text-amber-600">0</strong></span>
+                    <span>Bakul: <strong id="dashKoorBakul" class="text-blue-600">0</strong></span>
+                  </div>
+                </div>
+
+                <!-- 2. Petani Mitra Aktif -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Petani Mitra Aktif</span>
+                    <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm"><i class="fa-solid fa-person-digging"></i></span>
+                  </div>
+                  <div class="mt-3 flex items-baseline gap-2">
+                    <span id="dashPetaniAktif" class="text-2xl font-bold text-slate-900">0</span>
+                    <span class="text-xs text-slate-400">petani</span>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+                    <span>Baru: <strong id="dashPetaniBaru" class="text-blue-600">0</strong></span>
+                    <span>Lama: <strong id="dashPetaniLama" class="text-slate-700">0</strong></span>
+                  </div>
+                </div>
+
+                <!-- 3. Total Titik/Lahan Aktif -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Titik / Lahan Aktif</span>
+                    <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm"><i class="fa-solid fa-map-location-dot"></i></span>
+                  </div>
+                  <div class="mt-3 flex items-baseline gap-2">
+                    <span id="dashLahanAktif" class="text-2xl font-bold text-slate-900">0</span>
+                    <span class="text-xs text-slate-400">titik</span>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+                    <span>Baru: <strong id="dashLahanBaru" class="text-blue-600">0</strong></span>
+                    <span>Lama: <strong id="dashLahanLama" class="text-slate-700">0</strong></span>
+                  </div>
+                </div>
+
+                <!-- 4. Total Luas Lahan Aktif -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Luas Lahan Aktif</span>
+                    <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm"><i class="fa-solid fa-chart-area"></i></span>
+                  </div>
+                  <div class="mt-3 flex items-baseline gap-2">
+                    <span id="dashTotalLuas" class="text-2xl font-bold text-emerald-700">0.00</span>
+                    <span class="text-xs text-slate-400">Hektare</span>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+                    <span>Baru: <strong id="dashLuasBaru" class="text-blue-600">0.00 Ha</strong></span>
+                    <span>Lama: <strong id="dashLuasLama" class="text-slate-700">0.00 Ha</strong></span>
+                  </div>
+                </div>
               </div>
-              <div class="mt-3 flex items-baseline gap-2">
-                <span id="dashTotalKoordinator" class="text-2xl font-bold text-slate-900">0</span>
-                <span class="text-xs text-slate-400">orang</span>
-              </div>
-              <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
-                <span>Aktif: <strong id="dashAktifKoordinator" class="text-emerald-600">0</strong></span>
-                <span>Nonaktif: <strong id="dashNonaktifKoordinator" class="text-rose-500">0</strong></span>
+
+              <!-- 4 DIAGRAM / CHART CARDS -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Chart 1: Sebaran Klaster Petani Aktif (Luas Dominan) -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-800">Sebaran Klaster Petani Aktif</h3>
+                    <p class="text-[11px] text-slate-400">Berdasarkan klaster dengan luas lahan dominan tiap petani</p>
+                  </div>
+                  <div id="chartKlasterPetani" class="space-y-3"></div>
+                </div>
+
+                <!-- Chart 2: Sebaran Klaster Lahan Aktif (Berdasarkan Luas) -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-800">Sebaran Klaster Lahan Aktif</h3>
+                    <p class="text-[11px] text-slate-400">Berdasarkan proporsi total luas lahan (Ha) per klaster</p>
+                  </div>
+                  <div id="chartKlasterLahan" class="space-y-3"></div>
+                </div>
+
+                <!-- Chart 3: Profil Permodalan -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-800">Prosentase Profil Permodalan</h3>
+                    <p class="text-[11px] text-slate-400">Distribusi profil permodalan petani mitra aktif</p>
+                  </div>
+                  <div id="chartProfilPermodalan" class="space-y-3"></div>
+                </div>
+
+                <!-- Chart 4: Profil Tenaga Kerja -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-800">Prosentase Profil Tenaga Kerja</h3>
+                    <p class="text-[11px] text-slate-400">Distribusi profil tenaga kerja petani mitra aktif</p>
+                  </div>
+                  <div id="chartProfilTenagaKerja" class="space-y-3"></div>
+                </div>
               </div>
             </div>
 
-            <!-- Petani Mitra Card -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Petani Mitra</span>
-                <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm"><i class="fa-solid fa-person-digging"></i></span>
-              </div>
-              <div class="mt-3 flex items-baseline gap-2">
-                <span id="dashTotalPetani" class="text-2xl font-bold text-slate-900">0</span>
-                <span class="text-xs text-slate-400">petani</span>
-              </div>
-              <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
-                <span>Baru: <strong id="dashPetaniBaru" class="text-blue-600">0</strong></span>
-                <span>Lama: <strong id="dashPetaniLama" class="text-slate-700">0</strong></span>
-                <span>Aktif: <strong id="dashPetaniAktif" class="text-emerald-600">0</strong></span>
+            <!-- PANEL 2: VERIFIKASI LAHAN -->
+            <div id="dashStage_verif_lahan" class="dash-stage-panel hidden fade-in">
+              <div class="bg-white p-10 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-3">
+                <span class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl"><i class="fa-solid fa-clipboard-check"></i></span>
+                <h3 class="text-base font-bold text-slate-800">Dashboard Verifikasi Lahan</h3>
+                <p class="text-xs text-slate-500 max-w-md">Ringkasan metrik dan grafik tahap Verifikasi Lahan sedang dalam tahap pengembangan.</p>
+                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold uppercase">On Progress</span>
               </div>
             </div>
 
-            <!-- Total Lahan Card -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Identitas Lahan</span>
-                <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm"><i class="fa-solid fa-map-location-dot"></i></span>
-              </div>
-              <div class="mt-3 flex items-baseline gap-2">
-                <span id="dashTotalLahan" class="text-2xl font-bold text-slate-900">0</span>
-                <span class="text-xs text-slate-400">bidang</span>
-              </div>
-              <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
-                <span>Aktif: <strong id="dashLahanAktif" class="text-emerald-600">0</strong></span>
-                <span>Nonaktif: <strong id="dashLahanNonaktif" class="text-rose-500">0</strong></span>
+            <!-- PANEL 3: VERIFIKASI ADMIN -->
+            <div id="dashStage_verif_admin" class="dash-stage-panel hidden fade-in">
+              <div class="bg-white p-10 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-3">
+                <span class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl"><i class="fa-solid fa-user-check"></i></span>
+                <h3 class="text-base font-bold text-slate-800">Dashboard Verifikasi Admin</h3>
+                <p class="text-xs text-slate-500 max-w-md">Ringkasan metrik dan grafik tahap Verifikasi Admin sedang dalam tahap pengembangan.</p>
+                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold uppercase">On Progress</span>
               </div>
             </div>
 
-            <!-- Total Luas Ha Card -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Luas Lahan Aktif</span>
-                <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm"><i class="fa-solid fa-chart-area"></i></span>
+            <!-- PANEL 4: VERIFIKASI VARIETAS -->
+            <div id="dashStage_verif_varietas" class="dash-stage-panel hidden fade-in">
+              <div class="bg-white p-10 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-3">
+                <span class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl"><i class="fa-solid fa-seedling"></i></span>
+                <h3 class="text-base font-bold text-slate-800">Dashboard Verifikasi Varietas</h3>
+                <p class="text-xs text-slate-500 max-w-md">Ringkasan metrik dan grafik tahap Verifikasi Varietas sedang dalam tahap pengembangan.</p>
+                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold uppercase">On Progress</span>
               </div>
-              <div class="mt-3 flex items-baseline gap-2">
-                <span id="dashTotalLuas" class="text-2xl font-bold text-emerald-700">0.00</span>
-                <span class="text-xs text-slate-400">Hektare</span>
-              </div>
-              <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
-                <span>Milik: <strong id="dashLuasMilik" class="text-slate-700">0 Ha</strong></span>
-                <span>Sewa: <strong id="dashLuasSewa" class="text-slate-700">0 Ha</strong></span>
+            </div>
+
+            <!-- PANEL 5: FINAL MITRA -->
+            <div id="dashStage_final_mitra" class="dash-stage-panel hidden fade-in">
+              <div class="bg-white p-10 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-3">
+                <span class="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl"><i class="fa-solid fa-award"></i></span>
+                <h3 class="text-base font-bold text-slate-800">Dashboard Final Mitra</h3>
+                <p class="text-xs text-slate-500 max-w-md">Ringkasan metrik dan grafik tahap Final Mitra sedang dalam tahap pengembangan.</p>
+                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold uppercase">On Progress</span>
               </div>
             </div>
           </div>
 
-          <!-- DETAILED CHARTS & SUMMARY TABLES -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Profil Permodalan & Tenaga Kerja -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-              <h3 class="text-sm font-bold text-slate-800">Distribusi Profil Petani</h3>
-              <div class="space-y-3" id="dashDistributionProfile">
+          <!-- ==================== VIEW B: KINERJA ORGANISASI ==================== -->
+          <div id="dashViewKinerja" class="space-y-6 hidden">
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div>
-                  <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                    <span>Permodalan Mandiri</span>
-                    <span id="pctPermodalanMandiri">0%</span>
-                  </div>
-                  <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div id="barPermodalanMandiri" class="bg-emerald-500 h-2 rounded-full" style="width: 0%"></div>
-                  </div>
+                  <h2 class="text-sm font-bold text-slate-800">Kinerja Field Force — Prosentase Kunjungan Bulanan</h2>
+                  <p class="text-[11px] text-slate-500">Berdasarkan target petani aktif dari Verifikasi Admin (Petani & Lahan Aktif Lolos Verifikasi Lahan)</p>
                 </div>
-                <div>
-                  <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                    <span>Permodalan Hutang / MIX</span>
-                    <span id="pctPermodalanHutang">0%</span>
-                  </div>
-                  <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div id="barPermodalanHutang" class="bg-amber-500 h-2 rounded-full" style="width: 0%"></div>
+                <div class="flex items-center gap-3">
+                  <div class="px-3 py-1.5 bg-emerald-50 border border-emerald-100 rounded-xl text-center">
+                    <span class="block text-[10px] text-emerald-700 font-semibold uppercase">Target Petani Aktif</span>
+                    <span id="dashKinerjaTargetPetani" class="text-sm font-extrabold text-emerald-800">0 Petani</span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Klaster & Kepemilikan -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-              <h3 class="text-sm font-bold text-slate-800">Karakteristik Lahan</h3>
-              <div class="grid grid-cols-2 gap-3 text-center">
-                <div class="p-3 bg-slate-50 rounded-xl">
-                  <span class="text-xs text-slate-500 block">Status Alas Baru</span>
-                  <span id="dashAlasBaru" class="text-lg font-bold text-slate-800">0</span>
-                </div>
-                <div class="p-3 bg-slate-50 rounded-xl">
-                  <span class="text-xs text-slate-500 block">Status Alas Lama</span>
-                  <span id="dashAlasLama" class="text-lg font-bold text-slate-800">0</span>
-                </div>
-                <div class="p-3 bg-slate-50 rounded-xl">
-                  <span class="text-xs text-slate-500 block">Tanah Tebal</span>
-                  <span id="dashTanahTebal" class="text-lg font-bold text-slate-800">0</span>
-                </div>
-                <div class="p-3 bg-slate-50 rounded-xl">
-                  <span class="text-xs text-slate-500 block">Tanah Sedang/Tipis</span>
-                  <span id="dashTanahLain" class="text-lg font-bold text-slate-800">0</span>
-                </div>
+              <!-- 12-Month Bar Chart -->
+              <div id="chartKinerjaFF" class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-12 gap-3 pt-2">
+                <!-- Rendered via JS -->
               </div>
             </div>
           </div>
@@ -973,6 +1088,45 @@
           <div id="emptyVerifikasi" class="p-8 text-center bg-white rounded-xl border border-slate-200 text-slate-400 hidden">
             <i class="fa-solid fa-clipboard-question text-2xl mb-2 text-slate-300"></i>
             <p class="text-xs">Tidak ada lahan yang cocok dengan filter pencarian.</p>
+          </div>
+        </section>
+
+<!-- ================= PAGE: VERIFIKASI ADMIN ================= -->
+        <section id="pageVerifikasi_admin" class="page-section hidden fade-in space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-bold text-slate-900">Verifikasi Admin</h1>
+              <p class="text-xs text-slate-500">Dasar data petani dan lahan berstatus AKTIF yang telah LOLOS verifikasi lahan</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="window.SIPETA.loadDashboardData()" class="px-3 py-2 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold rounded-xl shadow-sm flex items-center gap-2 transition" title="Refresh Data">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span class="hidden sm:inline">Refresh Data</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Toolbar -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-3 items-center">
+            <div class="flex-1 min-w-[200px]">
+              <input type="text" id="filterVerifAdminKeyword" placeholder="Cari ID TMG, nama petani, alias, NIK, kode lahan..." class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            </div>
+            <select id="filterVerifAdminTrader" class="text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none hidden">
+              <option value="">Semua Trader</option>
+            </select>
+            <select id="filterVerifAdminKoordinator" class="text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none">
+              <option value="">Semua Koordinator</option>
+            </select>
+          </div>
+
+          <!-- CONTAINER GROUPING KOORDINATOR -> PETANI -> LAHAN LOLOS VERIFIKASI -->
+          <div id="containerVerifAdminGrouped" class="space-y-6">
+            <!-- Rendered via JS -->
+          </div>
+
+          <div id="emptyVerifAdmin" class="p-8 text-center bg-white rounded-xl border border-slate-200 text-slate-400 hidden">
+            <i class="fa-solid fa-user-check text-2xl mb-2 text-slate-300"></i>
+            <p class="text-xs">Belum ada data petani dan lahan aktif yang lolos verifikasi lahan.</p>
           </div>
         </section>
 
@@ -1673,12 +1827,12 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block font-semibold text-slate-700 mb-1">Tanaman Sebelumnya</label>
-            <input type="text" id="lahanTanamanSebelum" class="w-full p-2.5 border border-slate-200 rounded-xl uppercase" placeholder="Contoh: SNERK">
+            <label class="block font-semibold text-slate-700 mb-1">Tanaman Sebelumnya *</label>
+            <input type="text" id="lahanTanamanSebelum" required class="w-full p-2.5 border border-slate-200 rounded-xl uppercase" placeholder="Contoh: SNERK / BERA">
           </div>
           <div>
-            <label class="block font-semibold text-slate-700 mb-1">Umur Tanaman (Thn >= 0)</label>
-            <input type="number" id="lahanUmurTanaman" min="0" class="w-full p-2.5 border border-slate-200 rounded-xl" placeholder="0">
+            <label class="block font-semibold text-slate-700 mb-1">Umur Tanaman (Thn >= 0) *</label>
+            <input type="number" id="lahanUmurTanaman" required min="0" class="w-full p-2.5 border border-slate-200 rounded-xl" placeholder="0">
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Ketebalan Tanah *</label>
@@ -1958,10 +2112,13 @@
 
         <div class="pt-2">
           <div class="flex justify-between items-center mb-1">
-            <label class="font-semibold text-slate-700">Tanda Tangan PIC *</label>
-            <button type="button" onclick="window.SIPETA.clearCanvas('canvasPicSign')" class="text-[10px] text-rose-600 hover:underline">Hapus</button>
+            <label class="font-semibold text-slate-700">Tanda Tangan PIC (Otomatis dari Spesimen) *</label>
+            <span class="text-[10px] text-emerald-600 font-semibold"><i class="fa-solid fa-wand-magic-sparkles mr-0.5"></i>Auto-Fill</span>
           </div>
-          <canvas id="canvasPicSign" width="440" height="150" class="signature-canvas w-full bg-slate-50"></canvas>
+          <input type="hidden" id="verifSpecSignData">
+          <div id="verifSpecSignPreview" class="w-full min-h-[110px] rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 flex items-center justify-center p-3 text-center">
+            <!-- Otomatis diisi oleh spesimen TTD PIC -->
+          </div>
         </div>
 
         <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
@@ -2444,6 +2601,18 @@
           <button type="button" id="btnUploadUserFoto" onclick="document.getElementById('upFotoFile').click()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
             <i class="fa-solid fa-camera"></i>
             <span>Upload / Ganti Foto Profil</span>
+          </button>
+        </div>
+
+        <div id="upSpecimenSection" class="pt-3 border-t border-slate-100 space-y-2 hidden">
+          <div class="flex justify-between items-center">
+            <label class="font-bold text-slate-700">Spesimen TTD Verifikasi</label>
+            <button type="button" id="btnClearUserSpecSign" class="text-[10px] text-rose-600 hover:underline font-semibold">Hapus</button>
+          </div>
+          <canvas id="canvasUserSpecSign" width="320" height="110" class="signature-canvas w-full bg-slate-50"></canvas>
+          <button type="button" id="btnSaveUserSpecSign" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+            <i class="fa-solid fa-signature"></i>
+            <span>Simpan Spesimen TTD</span>
           </button>
         </div>
 
@@ -3126,7 +3295,7 @@
         if (navAdminMobile) navAdminMobile.style.display = isAdmin ? 'flex' : 'none';
 
         // Toggle Filter Trader Global
-        var trdFilters = ['filterDashboardTrader', 'filterKoorTrader', 'filterPetaniTrader', 'filterVerifikasiTrader', 'wrapperReportTrader'];
+        var trdFilters = ['filterDashboardTrader', 'filterKoorTrader', 'filterPetaniTrader', 'filterVerifikasiTrader', 'filterVerifAdminTrader', 'wrapperReportTrader'];
         trdFilters.forEach(function(id) {
           var el = document.getElementById(id);
           if (el) {
@@ -3366,8 +3535,10 @@
         if (trdKoor) trdKoor.innerHTML = options;
         if (trdLaporan) trdLaporan.innerHTML = options;
         if (trdDash) trdDash.innerHTML = options;
+        var trdVerifAdmin = document.getElementById('filterVerifAdminTrader');
         if (trdPetani) trdPetani.innerHTML = options;
         if (trdVerif) trdVerif.innerHTML = options;
+        if (trdVerifAdmin) trdVerifAdmin.innerHTML = options;
         if (selKoorTrader) selKoorTrader.innerHTML = formOptions;
         if (selUserTrader) selUserTrader.innerHTML = formOptions;
         if (selPicAssignTrd) selPicAssignTrd.innerHTML = formOptions;
@@ -3391,6 +3562,8 @@
 
         sel.innerHTML = opts;
         if (filterKoor) filterKoor.innerHTML = filterOpts;
+        var filterKoorVerifAdmin = document.getElementById('filterVerifAdminKoordinator');
+        if (filterKoorVerifAdmin) filterKoorVerifAdmin.innerHTML = filterOpts;
       }
 
       function populatePetaniSelect() {
@@ -3462,6 +3635,7 @@
         if (activePage === 'petani') renderPetani();
         if (activePage === 'lahan') renderLahan();
         if (activePage === 'verifikasi') renderVerifikasi();
+        if (activePage === 'verifikasi_admin') renderVerifikasiAdmin();
         if (activePage === 'laporan') generateReport();
         if (activePage === 'pengguna') renderPengguna();
         if (activePage === 'trader_config') renderTraderConfig();
@@ -3473,92 +3647,279 @@
         if (activePage === 'gap_bibit') renderPembibitan();
       }
 
-      // 11. RENDER DASHBOARD (HIERARKI STATUS & AGREGASI)
+      // 11. RENDER DASHBOARD (RINGKASAN OPERASIONAL & KINERJA ORGANISASI)
       function renderDashboard() {
+        var viewMode = document.getElementById('filterDashboardView') ? document.getElementById('filterDashboardView').value : 'RINGKASAN_OPERASIONAL';
         var trdFilter = document.getElementById('filterDashboardTrader') ? document.getElementById('filterDashboardTrader').value : '';
-        
+
+        var elOp = document.getElementById('dashViewOperasional');
+        var elKin = document.getElementById('dashViewKinerja');
+        var elTitle = document.getElementById('dashPageTitle');
+        var elSub = document.getElementById('dashPageSubtitle');
+
+        if (viewMode === 'KINERJA_ORGANISASI') {
+          if (elOp) elOp.classList.add('hidden');
+          if (elKin) elKin.classList.remove('hidden');
+          if (elTitle) elTitle.textContent = 'Kinerja Organisasi';
+          if (elSub) elSub.textContent = 'Monitoring persentase kunjungan Field Force per bulan terhadap target petani aktif';
+        } else {
+          if (elOp) elOp.classList.remove('hidden');
+          if (elKin) elKin.classList.add('hidden');
+          if (elTitle) elTitle.textContent = 'Ringkasan Operasional';
+          if (elSub) elSub.textContent = 'Status data registrasi mitra dan lahan aktif di cakupan akses Anda';
+        }
+
         var koorList = localStore.koordinators.filter(function(k) { return !trdFilter || k.traderId === trdFilter; });
         var petaniList = localStore.petani.filter(function(p) { return !trdFilter || p.traderId === trdFilter; });
         var lahanList = localStore.lahan.filter(function(l) { return !trdFilter || l.traderId === trdFilter; });
 
         var activeKoorMap = {};
+        var koorAktifList = [];
         koorList.forEach(function(k) {
-          if (k.status === 'AKTIF') activeKoorMap[k.id] = true;
+          if (k.status === 'AKTIF') {
+            activeKoorMap[k.id] = true;
+            koorAktifList.push(k);
+          }
         });
 
         var activePetaniMap = {};
+        var petaniAktifList = [];
         petaniList.forEach(function(p) {
           if (p.status === 'AKTIF' && activeKoorMap[p.koordinatorId]) {
             activePetaniMap[p.id] = true;
+            petaniAktifList.push(p);
           }
         });
 
-        var totalKoor = koorList.length;
-        var aktifKoor = koorList.filter(function(k) { return k.status === 'AKTIF'; }).length;
-        document.getElementById('dashTotalKoordinator').textContent = totalKoor;
-        document.getElementById('dashAktifKoordinator').textContent = aktifKoor;
-        document.getElementById('dashNonaktifKoordinator').textContent = totalKoor - aktifKoor;
-
-        var totalPetani = petaniList.length;
-        var aktifPetani = 0;
-        var petaniBaru = 0;
-        var petaniLama = 0;
-        var mandiriCount = 0;
-        var hutangCount = 0;
-
-        petaniList.forEach(function(p) {
-          if (p.status === 'AKTIF' && activeKoorMap[p.koordinatorId]) aktifPetani++;
-          if (p.statusPetani === 'BARU') petaniBaru++; else petaniLama++;
-          if (p.permodalan === 'MANDIRI') mandiriCount++; else hutangCount++;
+        var lahanAktifList = lahanList.filter(function(l) {
+          return l.status === 'AKTIF' && activePetaniMap[l.petaniId];
         });
 
-        document.getElementById('dashTotalPetani').textContent = totalPetani;
-        document.getElementById('dashPetaniAktif').textContent = aktifPetani;
+        function renderBarChart(containerId, items, totalVal, unitLabel) {
+          var el = document.getElementById(containerId);
+          if (!el) return;
+          if (!items.length || totalVal <= 0) {
+            el.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada data aktif.</p>';
+            return;
+          }
+          var colors = ['bg-emerald-500', 'bg-blue-500', 'bg-amber-500', 'bg-indigo-500', 'bg-teal-500', 'bg-rose-500', 'bg-slate-500'];
+          var html = '';
+          items.forEach(function(it, idx) {
+            var pct = totalVal > 0 ? ((it.value / totalVal) * 100) : 0;
+            var valText = unitLabel === 'Ha' ? it.value.toFixed(2) + ' Ha' : it.value + ' ' + unitLabel;
+            var barColor = it.color || colors[idx % colors.length];
+            html +=
+              '<div>' +
+                '<div class="flex justify-between text-xs font-medium text-slate-600 mb-1">' +
+                  '<span class="truncate pr-2">' + escapeHTML(it.label) + '</span>' +
+                  '<span class="font-bold text-slate-800 whitespace-nowrap">' + pct.toFixed(1) + '% <span class="text-[10px] font-normal text-slate-400">(' + valText + ')</span></span>' +
+                '</div>' +
+                '<div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">' +
+                  '<div class="' + barColor + ' h-2.5 rounded-full transition-all duration-300" style="width: ' + Math.min(100, pct).toFixed(1) + '%"></div>' +
+                '</div>' +
+              '</div>';
+          });
+          el.innerHTML = html;
+        }
+
+        // === 1. RINGKASAN OPERASIONAL ===
+        var koorPetani = 0, koorSemiBakul = 0, koorBakul = 0;
+        koorAktifList.forEach(function(k) {
+          var prof = String(k.profil || '').toUpperCase();
+          if (prof === 'PETANI') koorPetani++;
+          else if (prof === 'SEMI BAKUL') koorSemiBakul++;
+          else if (prof === 'BAKUL') koorBakul++;
+        });
+        document.getElementById('dashAktifKoordinator').textContent = koorAktifList.length;
+        document.getElementById('dashKoorPetani').textContent = koorPetani;
+        document.getElementById('dashKoorSemiBakul').textContent = koorSemiBakul;
+        document.getElementById('dashKoorBakul').textContent = koorBakul;
+
+        var petaniBaru = 0, petaniLama = 0;
+        var modalMap = { 'MANDIRI': 0, 'HUTANG': 0, 'MIX': 0 };
+        var tkMap = { 'SENDIRI': 0, 'LUAR': 0, 'MIX': 0 };
+
+        petaniAktifList.forEach(function(p) {
+          if (String(p.statusPetani || '').toUpperCase() === 'BARU') petaniBaru++; else petaniLama++;
+          var mKey = String(p.permodalan || 'LAINNYA').toUpperCase();
+          modalMap[mKey] = (modalMap[mKey] || 0) + 1;
+          var tKey = String(p.tenagaKerja || 'LAINNYA').toUpperCase();
+          tkMap[tKey] = (tkMap[tKey] || 0) + 1;
+        });
+
+        document.getElementById('dashPetaniAktif').textContent = petaniAktifList.length;
         document.getElementById('dashPetaniBaru').textContent = petaniBaru;
         document.getElementById('dashPetaniLama').textContent = petaniLama;
 
-        var totalLahan = lahanList.length;
-        var aktifLahan = 0;
-        var totalLuasAktif = 0;
-        var luasMilik = 0;
-        var luasSewa = 0;
-        var alasBaru = 0;
-        var alasLama = 0;
-        var tanahTebal = 0;
-        var tanahLain = 0;
+        var lahanBaru = 0, lahanLama = 0;
+        var totalLuasAktif = 0, luasBaru = 0, luasLama = 0;
+        var klasterLuasMap = {};
+        var petaniKlasterLuas = {};
 
-        lahanList.forEach(function(l) {
-          var isFullActive = l.status === 'AKTIF' && activePetaniMap[l.petaniId];
-          if (isFullActive) {
-            aktifLahan++;
-            var luas = parseFloat(l.luasHa) || 0;
-            totalLuasAktif += luas;
-            if (l.kepemilikan === 'MILIK') luasMilik += luas; else luasSewa += luas;
+        lahanAktifList.forEach(function(l) {
+          var luas = parseFloat(l.luasHa) || 0;
+          totalLuasAktif += luas;
+          if (String(l.statusAlas || '').toUpperCase() === 'BARU') {
+            lahanBaru++;
+            luasBaru += luas;
+          } else {
+            lahanLama++;
+            luasLama += luas;
           }
-          if (l.statusAlas === 'BARU') alasBaru++; else alasLama++;
-          if (l.ketebalan === 'TEBAL') tanahTebal++; else tanahLain++;
+
+          var kl = String(l.klaster || 'LAINNYA').toUpperCase();
+          klasterLuasMap[kl] = (klasterLuasMap[kl] || 0) + luas;
+
+          if (!petaniKlasterLuas[l.petaniId]) petaniKlasterLuas[l.petaniId] = {};
+          petaniKlasterLuas[l.petaniId][kl] = (petaniKlasterLuas[l.petaniId][kl] || 0) + luas;
         });
 
-        document.getElementById('dashTotalLahan').textContent = totalLahan;
-        document.getElementById('dashLahanAktif').textContent = aktifLahan;
-        document.getElementById('dashLahanNonaktif').textContent = totalLahan - aktifLahan;
+        document.getElementById('dashLahanAktif').textContent = lahanAktifList.length;
+        document.getElementById('dashLahanBaru').textContent = lahanBaru;
+        document.getElementById('dashLahanLama').textContent = lahanLama;
         document.getElementById('dashTotalLuas').textContent = totalLuasAktif.toFixed(2);
-        document.getElementById('dashLuasMilik').textContent = luasMilik.toFixed(2) + ' Ha';
-        document.getElementById('dashLuasSewa').textContent = luasSewa.toFixed(2) + ' Ha';
+        document.getElementById('dashLuasBaru').textContent = luasBaru.toFixed(2) + ' Ha';
+        document.getElementById('dashLuasLama').textContent = luasLama.toFixed(2) + ' Ha';
 
-        document.getElementById('dashAlasBaru').textContent = alasBaru;
-        document.getElementById('dashAlasLama').textContent = alasLama;
-        document.getElementById('dashTanahTebal').textContent = tanahTebal;
-        document.getElementById('dashTanahLain').textContent = tanahLain;
+        // Chart 1: Klaster Petani Aktif (Berdasarkan Luas Dominan)
+        var klasterPetaniCount = {};
+        var totalPetaniBerlahan = 0;
+        petaniAktifList.forEach(function(p) {
+          var mapKl = petaniKlasterLuas[p.id];
+          if (!mapKl) return;
+          var domKl = '';
+          var maxLuas = -1;
+          for (var kName in mapKl) {
+            if (mapKl[kName] > maxLuas) {
+              maxLuas = mapKl[kName];
+              domKl = kName;
+            }
+          }
+          if (domKl) {
+            klasterPetaniCount[domKl] = (klasterPetaniCount[domKl] || 0) + 1;
+            totalPetaniBerlahan++;
+          }
+        });
+        var arrKlasterPetani = Object.keys(klasterPetaniCount).map(function(k) {
+          return { label: k, value: klasterPetaniCount[k] };
+        }).sort(function(a, b) { return b.value - a.value; });
+        renderBarChart('chartKlasterPetani', arrKlasterPetani, totalPetaniBerlahan, 'Petani');
 
-        var totalProf = totalPetani || 1;
-        var pctMandiri = Math.round((mandiriCount / totalProf) * 100);
-        var pctHutang = 100 - pctMandiri;
-        document.getElementById('pctPermodalanMandiri').textContent = pctMandiri + '%';
-        document.getElementById('barPermodalanMandiri').style.width = pctMandiri + '%';
-        document.getElementById('pctPermodalanHutang').textContent = pctHutang + '%';
-        document.getElementById('barPermodalanHutang').style.width = pctHutang + '%';
+        // Chart 2: Klaster Lahan Aktif (Berdasarkan Luas)
+        var arrKlasterLahan = Object.keys(klasterLuasMap).map(function(k) {
+          return { label: k, value: klasterLuasMap[k] };
+        }).sort(function(a, b) { return b.value - a.value; });
+        renderBarChart('chartKlasterLahan', arrKlasterLahan, totalLuasAktif, 'Ha');
+
+        // Chart 3: Profil Permodalan
+        var arrModal = [
+          { label: 'MANDIRI', value: modalMap['MANDIRI'] || 0, color: 'bg-emerald-500' },
+          { label: 'HUTANG', value: modalMap['HUTANG'] || 0, color: 'bg-amber-500' },
+          { label: 'MIX', value: modalMap['MIX'] || 0, color: 'bg-blue-500' }
+        ];
+        renderBarChart('chartProfilPermodalan', arrModal, petaniAktifList.length, 'Petani');
+
+        // Chart 4: Profil Tenaga Kerja
+        var arrTk = [
+          { label: 'SENDIRI', value: tkMap['SENDIRI'] || 0, color: 'bg-emerald-500' },
+          { label: 'LUAR', value: tkMap['LUAR'] || 0, color: 'bg-indigo-500' },
+          { label: 'MIX', value: tkMap['MIX'] || 0, color: 'bg-amber-500' }
+        ];
+        renderBarChart('chartProfilTenagaKerja', arrTk, petaniAktifList.length, 'Petani');
+
+        // === 2. KINERJA ORGANISASI (KUNJUNGAN FIELD FORCE PER BULAN) ===
+        var lahanLolosSet = {};
+        lahanAktifList.forEach(function(l) {
+          if (String(l.statusVerifikasi || '').toUpperCase() === 'LOLOS') {
+            lahanLolosSet[l.petaniId] = true;
+          }
+        });
+        var targetPetaniIds = Object.keys(lahanLolosSet);
+        var targetCount = targetPetaniIds.length;
+        var elTarget = document.getElementById('dashKinerjaTargetPetani');
+        if (elTarget) elTarget.textContent = targetCount + ' Petani';
+
+        var monthlyVisited = [];
+        for (var m = 0; m < 12; m++) monthlyVisited.push({});
+
+        function recordVisit(dateStr, petaniId) {
+          if (!dateStr || !petaniId || !lahanLolosSet[petaniId]) return;
+          var d = new Date(String(dateStr).slice(0, 10));
+          if (isNaN(d.getTime())) return;
+          monthlyVisited[d.getMonth()][petaniId] = true;
+        }
+
+        (localStore.distribusiBenih || []).forEach(function(x) { recordVisit(x.Tanggal_Distribusi || x.Tanggal_Dibuat, x.Petani_ID); });
+        (localStore.sebarBenih || []).forEach(function(x) { recordVisit(x.Tanggal_Sebar || x.Timestamp, x.Petani_ID); });
+        (localStore.pembibitan || []).forEach(function(x) { recordVisit(x.Timestamp, x.Petani_ID); });
+
+        var monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        var chartFF = document.getElementById('chartKinerjaFF');
+        if (chartFF) {
+          var ffHtml = '';
+          for (var mi = 0; mi < 12; mi++) {
+            var visitedCount = Object.keys(monthlyVisited[mi]).length;
+            var pctVisit = targetCount > 0 ? Math.min(100, (visitedCount / targetCount) * 100) : 0;
+            ffHtml +=
+              '<div class="flex flex-col items-center bg-slate-50 border border-slate-100 rounded-xl p-2.5">' +
+                '<span class="text-[10px] font-bold text-emerald-700 mb-1.5">' + pctVisit.toFixed(0) + '%</span>' +
+                '<div class="w-5 h-28 bg-slate-200 rounded-full flex items-end overflow-hidden">' +
+                  '<div class="w-full bg-emerald-500 rounded-full transition-all duration-300" style="height: ' + pctVisit.toFixed(1) + '%"></div>' +
+                '</div>' +
+                '<span class="text-[11px] font-bold text-slate-700 mt-2">' + monthLabels[mi] + '</span>' +
+                '<span class="text-[10px] text-slate-400">' + visitedCount + '/' + targetCount + '</span>' +
+              '</div>';
+          }
+          chartFF.innerHTML = ffHtml;
+        }
       }
+
+      document.addEventListener('click', function(e) {
+        var stageBtn = e.target.closest('[data-dash-stage]');
+        if (!stageBtn) return;
+
+        var targetStage = stageBtn.getAttribute('data-dash-stage');
+        var allCards = document.querySelectorAll('.dash-stage-card');
+        var allPanels = document.querySelectorAll('.dash-stage-panel');
+
+        allCards.forEach(function(card) {
+          var isActive = card.getAttribute('data-dash-stage') === targetStage;
+          var iconBox = card.querySelector('.dash-stage-icon');
+          var subTxt = card.querySelector('.dash-stage-sub');
+
+          if (isActive) {
+            card.classList.remove('bg-white', 'text-slate-700', 'border-slate-200', 'hover:border-emerald-300', 'hover:bg-emerald-50/40', 'shadow-xs');
+            card.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600', 'shadow-sm');
+            if (iconBox) {
+              iconBox.classList.remove('bg-blue-50', 'text-blue-600', 'bg-indigo-50', 'text-indigo-600', 'bg-emerald-50', 'text-emerald-600', 'bg-teal-50', 'text-teal-600');
+              iconBox.classList.add('bg-white/20', 'text-white');
+            }
+            if (subTxt) {
+              subTxt.classList.remove('text-amber-600', 'text-slate-400');
+              subTxt.classList.add('text-emerald-100');
+            }
+          } else {
+            card.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600', 'shadow-sm');
+            card.classList.add('bg-white', 'text-slate-700', 'border-slate-200', 'hover:border-emerald-300', 'hover:bg-emerald-50/40', 'shadow-xs');
+            if (iconBox) {
+              iconBox.classList.remove('bg-white/20', 'text-white');
+              iconBox.classList.add('bg-slate-100', 'text-slate-600');
+            }
+            if (subTxt) {
+              subTxt.classList.remove('text-emerald-100');
+              subTxt.classList.add('text-amber-600');
+            }
+          }
+        });
+
+        allPanels.forEach(function(panel) {
+          if (panel.id === 'dashStage_' + targetStage) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        });
+      });
 
       // 12. RENDER KOORDINATOR
       function renderKoordinator() {
@@ -3907,6 +4268,208 @@
         }
       }
 
+ // 14.6 RENDER VERIFIKASI ADMIN (DASAR DATA: PETANI & LAHAN AKTIF + LOLOS VERIFIKASI LAHAN)
+      function renderVerifikasiAdmin() {
+        var container = document.getElementById('containerVerifAdminGrouped');
+        var emptyEl = document.getElementById('emptyVerifAdmin');
+        if (!container) return;
+
+        var kw = (document.getElementById('filterVerifAdminKeyword') ? document.getElementById('filterVerifAdminKeyword').value : '').toLowerCase();
+        var trdFilter = document.getElementById('filterVerifAdminTrader') ? document.getElementById('filterVerifAdminTrader').value : '';
+        var selectedKoorId = document.getElementById('filterVerifAdminKoordinator') ? document.getElementById('filterVerifAdminKoordinator').value : '';
+
+        container.innerHTML = '';
+
+        // 1. Ambil semua lahan yang AKTIF dan LOLOS verifikasi lahan
+        var lahanLolosList = localStore.lahan.filter(function(l) {
+          var isAktif = l.status === 'AKTIF';
+          var isLolos = String(l.statusVerifikasi || '').toUpperCase() === 'LOLOS';
+          var matchTrd = !trdFilter || l.traderId === trdFilter;
+          return isAktif && isLolos && matchTrd;
+        });
+
+        // 2. Ambil petani AKTIF yang memiliki minimal 1 lahan AKTIF & LOLOS verifikasi
+        var petaniLolosList = localStore.petani.filter(function(p) {
+          if (p.status !== 'AKTIF') return false;
+          if (selectedKoorId && p.koordinatorId !== selectedKoorId) return false;
+          if (trdFilter && p.traderId !== trdFilter) return false;
+
+          var lahanPetani = lahanLolosList.filter(function(l) { return l.petaniId === p.id; });
+          if (lahanPetani.length === 0) return false;
+
+          if (!kw) return true;
+          var matchPetani = p.id.toLowerCase().indexOf(kw) !== -1 ||
+            p.nama.toLowerCase().indexOf(kw) !== -1 ||
+            (p.alias || '').toLowerCase().indexOf(kw) !== -1 ||
+            String(p.nik || '').indexOf(kw) !== -1;
+          var matchLahan = lahanPetani.some(function(l) {
+            return (l.kodeLahan || '').toLowerCase().indexOf(kw) !== -1 ||
+              (l.aliasLahan || '').toLowerCase().indexOf(kw) !== -1;
+          });
+          return matchPetani || matchLahan;
+        });
+
+        // 3. Kelompokkan berdasarkan Koordinator AKTIF
+        var koorToRender = localStore.koordinators.filter(function(k) {
+          return k.status === 'AKTIF' &&
+            (!selectedKoorId || k.id === selectedKoorId) &&
+            (!trdFilter || k.traderId === trdFilter);
+        });
+
+        var totalRenderedGroups = 0;
+
+        koorToRender.forEach(function(k) {
+          var petaniUnderKoor = petaniLolosList.filter(function(p) { return p.koordinatorId === k.id; });
+          if (petaniUnderKoor.length === 0) return;
+
+          totalRenderedGroups++;
+          var trdObj = localStore.traders.find(function(t) { return t.id === k.traderId; });
+          var trdName = trdObj ? trdObj.name : '-';
+
+          var totalLuasKoor = 0;
+          petaniUnderKoor.forEach(function(p) {
+            lahanLolosList.forEach(function(l) {
+              if (l.petaniId === p.id) {
+                totalLuasKoor += parseFloat(l.luasValidasi || l.luasHa) || 0;
+              }
+            });
+          });
+
+          var groupCard = document.createElement('div');
+          groupCard.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6 fade-in';
+
+          var headerKoor =
+            '<div class="bg-slate-800 px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 text-white transition hover:bg-slate-700">' +
+              '<div class="flex-1 cursor-pointer flex items-center gap-3 select-none" data-va-toggle-koor="' + k.id + '" title="Klik untuk memunculkan/menyembunyikan daftar petani">' +
+                '<div class="w-6 h-6 flex items-center justify-center bg-slate-700 border border-slate-600 rounded text-slate-300 hover:text-white transition-colors shadow-sm">' +
+                  '<i id="icon-va-koor-' + k.id + '" class="fa-solid fa-chevron-right text-[10px] transition-transform"></i>' +
+                '</div>' +
+                '<div class="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center font-bold text-xs shadow-sm">' + escapeHTML(k.kodeSeri) + '</div>' +
+                '<div>' +
+                  '<div class="flex items-center gap-2">' +
+                    '<h3 class="text-sm font-bold uppercase"><button type="button" onclick="event.stopPropagation(); window.SIPETA.openNameCard(\'koordinator\', \'' + k.id + '\')" class="hover:text-emerald-300 hover:underline text-left uppercase transition">' + escapeHTML(k.nama) + '</button></h3>' +
+                    '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white">AKTIF</span>' +
+                  '</div>' +
+                  '<p class="text-[11px] text-slate-300">Trader: ' + escapeHTML(trdName) + ' &bull; Wilayah: ' + escapeHTML(k.desa) + ', ' + escapeHTML(k.kecamatan) + '</p>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex items-center gap-2 z-10">' +
+                '<span class="text-xs font-semibold bg-slate-700 px-2 py-1 border border-slate-600 rounded-md text-emerald-300">' + petaniUnderKoor.length + ' Petani</span>' +
+                '<span class="text-xs font-semibold bg-slate-700 px-2 py-1 border border-slate-600 rounded-md text-amber-300 font-mono">' + totalLuasKoor.toFixed(2) + ' Ha</span>' +
+              '</div>' +
+            '</div>';
+
+          var bodyKoor = '<div id="va-koor-container-' + k.id + '" class="hidden p-4 space-y-4 bg-slate-50">';
+
+          petaniUnderKoor.forEach(function(p) {
+            var lahanMilikPetani = lahanLolosList.filter(function(l) { return l.petaniId === p.id; });
+            var totalLuasPetani = 0;
+            lahanMilikPetani.forEach(function(l) {
+              totalLuasPetani += parseFloat(l.luasValidasi || l.luasHa) || 0;
+            });
+
+            bodyKoor +=
+              '<div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">' +
+                '<div class="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">' +
+                  '<div class="flex-1 cursor-pointer flex items-center gap-2.5 select-none" data-va-toggle-lahan="' + p.id + '" title="Klik untuk memunculkan/menyembunyikan daftar lahan lolos verifikasi">' +
+                    '<div class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded text-slate-400 hover:text-slate-600 transition-colors shadow-sm">' +
+                      '<i id="icon-va-lahan-' + p.id + '" class="fa-solid fa-chevron-right text-[10px] transition-transform"></i>' +
+                    '</div>' +
+                    renderAvatarHtml(p.foto, 'w-8 h-8 flex-none') +
+                    '<div>' +
+                      '<button type="button" onclick="event.stopPropagation(); window.SIPETA.openNameCard(\'petani\', \'' + p.id + '\')" class="font-bold text-slate-800 hover:text-emerald-600 hover:underline text-sm uppercase text-left transition">' + escapeHTML(p.nama) + '</button> ' +
+                      '<span class="text-xs text-slate-500">(' + escapeHTML(p.id) + ' - Alias: ' + escapeHTML(p.alias) + ')</span>' +
+                      ' <span class="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-1.5 py-0.5 rounded ml-1">LOLOS VERIF LAHAN</span>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="flex items-center gap-2">' +
+                    '<span class="text-xs font-semibold bg-white px-2 py-1 border border-slate-200 rounded-md text-emerald-700">' + lahanMilikPetani.length + ' Lahan</span>' +
+                    '<span class="text-xs font-semibold bg-white px-2 py-1 border border-slate-200 rounded-md text-blue-700 font-mono">' + totalLuasPetani.toFixed(2) + ' Ha</span>' +
+                  '</div>' +
+                '</div>' +
+                '<div id="va-lahan-container-' + p.id + '" class="hidden bg-white">' +
+                  '<div class="overflow-x-auto">' +
+                    '<table class="w-full text-left border-collapse text-xs">' +
+                      '<thead>' +
+                        '<tr class="text-slate-500 font-semibold uppercase tracking-wider border-b border-slate-100 bg-white">' +
+                          '<th class="p-3">Kode Lahan</th><th class="p-3">Nama Lahan</th><th class="p-3">Luas Validasi (Ha)</th><th class="p-3">Klaster Validasi</th><th class="p-3">Kepemilikan</th><th class="p-3">Alas</th><th class="p-3 text-center">Verif Lahan</th>' +
+                        '</tr>' +
+                      '</thead>' +
+                      '<tbody class="divide-y divide-slate-50">';
+
+            lahanMilikPetani.forEach(function(l) {
+              var luasShow = parseFloat(l.luasValidasi || l.luasHa) || 0;
+              var klasterShow = l.klasterValidasi || l.klaster || '-';
+              var tglVerif = l.tanggalVerifikasi ? String(l.tanggalVerifikasi).slice(0, 10) : '';
+
+              bodyKoor +=
+                '<tr class="hover:bg-slate-50 transition">' +
+                  '<td class="p-3 font-mono font-bold text-amber-800">' + escapeHTML(l.kodeLahan) + '</td>' +
+                  '<td class="p-3 font-medium text-slate-700">' + escapeHTML(l.aliasLahan) + '</td>' +
+                  '<td class="p-3 font-mono font-bold text-emerald-700">' + luasShow.toFixed(2) + '</td>' +
+                  '<td class="p-3 text-slate-600">' + escapeHTML(klasterShow) + '</td>' +
+                  '<td class="p-3"><span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ' + (l.kepemilikan === 'MILIK' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-700') + '">' + escapeHTML(l.kepemilikan) + '</span></td>' +
+                  '<td class="p-3 text-slate-600">' + escapeHTML(l.statusAlas) + '</td>' +
+                  '<td class="p-3 text-center">' +
+                    '<span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold"><i class="fa-solid fa-check mr-1"></i>LOLOS</span>' +
+                    (tglVerif ? '<br><span class="text-[10px] text-slate-400">' + escapeHTML(tglVerif) + '</span>' : '') +
+                  '</td>' +
+                '</tr>';
+            });
+
+            bodyKoor += '</tbody></table></div></div></div>';
+          });
+
+          bodyKoor += '</div>';
+          groupCard.innerHTML = headerKoor + bodyKoor;
+          container.appendChild(groupCard);
+        });
+
+        if (emptyEl) {
+          if (totalRenderedGroups === 0) emptyEl.classList.remove('hidden');
+          else emptyEl.classList.add('hidden');
+        }
+      }
+
+      document.addEventListener('input', function(e) {
+        if (e.target && e.target.id === 'filterVerifAdminKeyword') {
+          renderVerifikasiAdmin();
+        }
+      });
+
+      document.addEventListener('change', function(e) {
+        if (e.target && (e.target.id === 'filterVerifAdminTrader' || e.target.id === 'filterVerifAdminKoordinator')) {
+          renderVerifikasiAdmin();
+        }
+      });
+
+      document.addEventListener('click', function(e) {
+        var koorTrigger = e.target.closest('[data-va-toggle-koor]');
+        if (koorTrigger) {
+          var kId = koorTrigger.getAttribute('data-va-toggle-koor');
+          var kBox = document.getElementById('va-koor-container-' + kId);
+          var kIcon = document.getElementById('icon-va-koor-' + kId);
+          if (kBox && kIcon) {
+            var isHidden = kBox.classList.toggle('hidden');
+            kIcon.classList.toggle('fa-chevron-right', isHidden);
+            kIcon.classList.toggle('fa-chevron-down', !isHidden);
+          }
+          return;
+        }
+
+        var lahanTrigger = e.target.closest('[data-va-toggle-lahan]');
+        if (lahanTrigger) {
+          var pId = lahanTrigger.getAttribute('data-va-toggle-lahan');
+          var lBox = document.getElementById('va-lahan-container-' + pId);
+          var lIcon = document.getElementById('icon-va-lahan-' + pId);
+          if (lBox && lIcon) {
+            var isLHidden = lBox.classList.toggle('hidden');
+            lIcon.classList.toggle('fa-chevron-right', isLHidden);
+            lIcon.classList.toggle('fa-chevron-down', !isLHidden);
+          }
+        }
+      });     
+
 // 14.5 RENDER VERIFIKASI LAHAN & LOGIKA FORM
       function renderVerifikasi() {
         var container = document.getElementById('containerVerifikasiGrouped');
@@ -4061,7 +4624,6 @@ function openVerifikasiModal(lahanId) {
         if (!l) return;
 
         document.getElementById('formVerifikasi').reset();
-        clearCanvas('canvasPicSign');
 
         document.getElementById('verifLahanId').value = l.id;
         document.getElementById('verifKodeLahanLabel').innerText = l.kodeLahan + ' - ' + l.aliasLahan;
@@ -4083,16 +4645,22 @@ function openVerifikasiModal(lahanId) {
         // Panggil fungsi toggle untuk memastikan field catatan terbuka jika status = TIDAK LOLOS
         window.SIPETA.toggleCatatanVerifikasi();
 
-        // Tampilkan canvas sign jika sudah ada
-        if (l.tandaTanganPic && l.tandaTanganPic.length > 50) {
-          var canvas = document.getElementById('canvasPicSign');
-          var ctx = canvas.getContext('2d');
-          var img = new Image();
-          img.onload = function() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
-          };
-          img.src = l.tandaTanganPic;
+        // Otomatis isi tanda tangan selalu mengikuti master spesimen TTD dari Profil PIC yang login
+        var specSign = (currentUser && currentUser.tandaTangan && currentUser.tandaTangan.length > 50)
+          ? currentUser.tandaTangan
+          : (l.tandaTanganPic && l.tandaTanganPic.length > 50 ? l.tandaTanganPic : '');
+        var previewBox = document.getElementById('verifSpecSignPreview');
+        document.getElementById('verifSpecSignData').value = specSign;
+
+        if (specSign) {
+          previewBox.innerHTML = '<img src="' + specSign + '" alt="Spesimen TTD PIC" class="max-h-24 mx-auto object-contain">';
+        } else {
+          previewBox.innerHTML =
+            '<div class="text-xs text-rose-600 space-y-1">' +
+              '<i class="fa-solid fa-triangle-exclamation text-base"></i>' +
+              '<p class="font-semibold">Spesimen TTD belum diatur!</p>' +
+              '<p class="text-[11px] text-slate-500">Klik foto profil Anda di pojok kanan atas untuk menyimpan Spesimen TTD terlebih dahulu.</p>' +
+            '</div>';
         }
 
         document.getElementById('modalVerifikasi').classList.remove('hidden');
@@ -4111,7 +4679,7 @@ function openVerifikasiModal(lahanId) {
         var arahLereng = document.getElementById('verifLereng').value;
         var kemiringan = document.getElementById('verifKemiringan').value;
         var ketinggian = document.getElementById('verifKetinggian').value.trim();
-        var canvasPic = document.getElementById('canvasPicSign');
+        var specSignData = document.getElementById('verifSpecSignData').value;
 
         // Validasi wajib Catatan jika TIDAK LOLOS
         if (statusVerifikasi === 'TIDAK LOLOS' && catatanVerifikasi.length === 0) {
@@ -4119,8 +4687,8 @@ function openVerifikasiModal(lahanId) {
             return;
         }
 
-        if (isCanvasBlank('canvasPicSign')) {
-            showToast('Tanda Tangan PIC wajib diisi.', 'warning');
+        if (!specSignData || specSignData.length < 50) {
+            showToast('Spesimen Tanda Tangan PIC belum tersedia. Silakan buat dulu di menu Profil Anda.', 'warning');
             return;
         }
 
@@ -4136,7 +4704,7 @@ function openVerifikasiModal(lahanId) {
           arahLereng: arahLereng,
           kemiringan: kemiringan,
           ketinggian: ketinggian,
-          tandaTanganPic: canvasPic.toDataURL()
+          tandaTanganPic: specSignData
         };
 
         var btn = document.getElementById('btnSaveVerifikasi');
@@ -4302,14 +4870,18 @@ function openVerifikasiModal(lahanId) {
         var klaster = document.getElementById('lahanKlaster').value.trim();
         var statusAlas = document.getElementById('lahanStatusAlas').value;
         var kepemilikan = document.getElementById('lahanKepemilikan').value;
-        var tanamanSebelum = document.getElementById('lahanTanamanSebelum').value.trim();
-        var umurTanaman = parseInt(document.getElementById('lahanUmurTanaman').value, 10) || 0;
+        var tanamanSebelum = document.getElementById('lahanTanamanSebelum').value.trim().toUpperCase();
+        var umurRaw = document.getElementById('lahanUmurTanaman').value.trim();
+        var isBeraBero = (tanamanSebelum === 'BERA' || tanamanSebelum === 'BERO');
+        var umurTanaman = isBeraBero ? 0 : parseInt(umurRaw, 10);
         var ketebalan = document.getElementById('lahanKetebalan').value;
         var status = document.getElementById('lahanStatusAktif').value;
         var nomorUrut = parseInt(document.getElementById('lahanNomorUrut').value, 10) || 1;
 
         if (!petaniId) { showToast('Harap pilih petani pemilik lahan.', 'warning'); return; }
         if (isNaN(luasHa) || luasHa <= 0) { showToast('Luas lahan harus > 0.', 'warning'); return; }
+        if (!tanamanSebelum) { showToast('Tanaman Sebelumnya wajib diisi.', 'warning'); return; }
+        if (!isBeraBero && (umurRaw === '' || isNaN(umurTanaman) || umurTanaman < 0)) { showToast('Umur Tanaman wajib diisi (minimal 0).', 'warning'); return; }
 
         var petaniObj = localStore.petani.find(function(p) { return p.id === petaniId; });
         var koorObj = petaniObj ? localStore.koordinators.find(function(k) { return k.id === petaniObj.koordinatorId; }) : null;
@@ -4398,6 +4970,8 @@ function openVerifikasiModal(lahanId) {
                 { key: 'klaster', label: 'Klaster' },
                 { key: 'statusAlas', label: 'Status Alas' },
                 { key: 'kepemilikan', label: 'Kepemilikan Tanah' },
+                { key: 'tanamanSebelum', label: 'Tanaman Sebelumnya' },
+                { key: 'umurTanaman', label: 'Umur Tanaman', isNumberGeZero: true },
                 { key: 'ketebalan', label: 'Ketebalan Tanah' }
               ]
             };
@@ -4407,6 +4981,9 @@ function openVerifikasiModal(lahanId) {
               var val = item[r.key];
               if (r.isNumberGtZero) {
                 if (isNaN(parseFloat(val)) || parseFloat(val) <= 0) missing.push(r.label);
+              } else if (r.isNumberGeZero) {
+                var sNum = (val === null || val === undefined) ? '' : String(val).trim();
+                if (sNum === '' || isNaN(parseFloat(sNum)) || parseFloat(sNum) < 0) missing.push(r.label);
               } else {
                 var s = (val === null || val === undefined) ? '' : String(val).trim();
                 if (!s || s === '-') missing.push(r.label);
@@ -4704,10 +5281,32 @@ function openVerifikasiModal(lahanId) {
         document.getElementById('lahanId').value = '';
         document.getElementById('lahanNomorUrut').value = '1';
         document.getElementById('modalLahanTitle').innerText = 'Registrasi Identitas Lahan Baru';
+        syncLahanTanamanUmur();
         updateKodeLahanPreview();
         window.SIPETA.initDropdownWilayah('lahan');
         document.getElementById('modalLahan').classList.remove('hidden');
       }
+
+      function syncLahanTanamanUmur() {
+        var elTanaman = document.getElementById('lahanTanamanSebelum');
+        var elUmur = document.getElementById('lahanUmurTanaman');
+        if (!elTanaman || !elUmur) return;
+        var val = elTanaman.value.trim().toUpperCase();
+        if (val === 'BERA' || val === 'BERO') {
+          elUmur.value = '0';
+          elUmur.readOnly = true;
+          elUmur.classList.add('bg-slate-100', 'text-slate-500');
+        } else {
+          elUmur.readOnly = false;
+          elUmur.classList.remove('bg-slate-100', 'text-slate-500');
+        }
+      }
+
+      document.addEventListener('input', function(e) {
+        if (e.target && e.target.id === 'lahanTanamanSebelum') {
+          syncLahanTanamanUmur();
+        }
+      });
 
       function openLahanModalWithPetani(petaniId) {
         openLahanModal();
@@ -4732,8 +5331,9 @@ function openVerifikasiModal(lahanId) {
         document.getElementById('lahanKlaster').value = l.klaster;
         document.getElementById('lahanStatusAlas').value = l.statusAlas;
         document.getElementById('lahanKepemilikan').value = l.kepemilikan;
-        document.getElementById('lahanTanamanSebelum').value = l.tanamanSebelum;
-        document.getElementById('lahanUmurTanaman').value = l.umurTanaman;
+        document.getElementById('lahanTanamanSebelum').value = l.tanamanSebelum || '';
+        document.getElementById('lahanUmurTanaman').value = (l.umurTanaman !== undefined && l.umurTanaman !== null) ? l.umurTanaman : '';
+        syncLahanTanamanUmur();
         document.getElementById('lahanKetebalan').value = l.ketebalan;
         document.getElementById('lahanStatusAktif').value = l.status;
         document.getElementById('lahanNomorUrut').value = l.nomorUrut || 1;
@@ -5229,6 +5829,17 @@ function openVerifikasiModal(lahanId) {
           }
         }
       }
+
+      document.addEventListener('change', function(e) {
+        if (!e.target) return;
+        if (e.target.id === 'lahanDesa') {
+          var elDusun = document.getElementById('lahanDusun');
+          if (elDusun) elDusun.value = e.target.value;
+        } else if (e.target.id === 'lahanKabupaten' || e.target.id === 'lahanKecamatan') {
+          var elDusunReset = document.getElementById('lahanDusun');
+          if (elDusunReset) elDusunReset.value = '';
+        }
+      });
 
       function setWilayah(prefix, kab, kec, desa) {
         initDropdownWilayah(prefix);
@@ -6706,8 +7317,65 @@ function openVerifikasiModal(lahanId) {
           rowUp('Role Akses', currentUser.role) +
           rowUp('Cakupan Trader', traderText);
 
+        var specSec = document.getElementById('upSpecimenSection');
+        if (specSec) {
+          if (currentUser.role === 'PIC' || currentUser.role === 'ADMIN') {
+            specSec.classList.remove('hidden');
+            var cSpec = document.getElementById('canvasUserSpecSign');
+            if (cSpec && !cSpec.dataset.inited) {
+              initCanvasDraw('canvasUserSpecSign');
+              cSpec.dataset.inited = '1';
+            }
+            clearCanvas('canvasUserSpecSign');
+            if (currentUser.tandaTangan && currentUser.tandaTangan.length > 50) {
+              var imgSpec = new Image();
+              imgSpec.onload = function() {
+                cSpec.getContext('2d').drawImage(imgSpec, 0, 0, cSpec.width, cSpec.height);
+              };
+              imgSpec.src = currentUser.tandaTangan;
+            }
+          } else {
+            specSec.classList.add('hidden');
+          }
+        }
+
         document.getElementById('modalUserProfile').classList.remove('hidden');
       }
+
+      document.addEventListener('click', function(e) {
+        var btnClear = e.target.closest('#btnClearUserSpecSign');
+        if (btnClear) {
+          clearCanvas('canvasUserSpecSign');
+          return;
+        }
+        var btnSave = e.target.closest('#btnSaveUserSpecSign');
+        if (btnSave) {
+          if (isCanvasBlank('canvasUserSpecSign')) {
+            showToast('Silakan goreskan tanda tangan spesimen terlebih dahulu.', 'warning');
+            return;
+          }
+          var b64Sign = document.getElementById('canvasUserSpecSign').toDataURL('image/png');
+          btnSave.disabled = true;
+          btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Menyimpan...</span>';
+
+          gasRun('updateUserSignature', sessionToken, b64Sign).then(function(res) {
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fa-solid fa-signature"></i> <span>Simpan Spesimen TTD</span>';
+            if (res.sessionExpired) { handleSessionExpired(); return; }
+            if (res.success) {
+              currentUser.tandaTangan = res.tandaTangan;
+              localStorage.setItem('sipeta_user', JSON.stringify(currentUser));
+              showToast('Spesimen tanda tangan berhasil disimpan.', 'success');
+            } else {
+              showToast(res.message || 'Gagal menyimpan spesimen tanda tangan.', 'error');
+            }
+          }).catch(function(err) {
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fa-solid fa-signature"></i> <span>Simpan Spesimen TTD</span>';
+            showToast(err.message, 'error');
+          });
+        }
+      });
 
       document.addEventListener('change', function(e) {
         if (e.target.id === 'upFotoFile') {
