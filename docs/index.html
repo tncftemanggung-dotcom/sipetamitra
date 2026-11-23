@@ -4119,6 +4119,11 @@ function openVerifikasiModal(lahanId) {
             return;
         }
 
+        if (isCanvasBlank('canvasPicSign')) {
+            showToast('Tanda Tangan PIC wajib diisi.', 'warning');
+            return;
+        }
+
         var payload = {
           id: id,
           luasValidasi: luasValidasi,
@@ -4238,6 +4243,15 @@ function openVerifikasiModal(lahanId) {
 
         if (!koorId) { showToast('Harap pilih koordinator.', 'warning'); return; }
         if (nik.length !== 16) { showToast('NIK Petani wajib 16 digit.', 'warning'); return; }
+
+        if (isCanvasBlank('canvasPetaniSign')) {
+          showToast('Tanda Tangan Petani wajib diisi.', 'warning');
+          return;
+        }
+        if (isCanvasBlank('canvasFfSign')) {
+          showToast('Tanda Tangan Field Force wajib diisi.', 'warning');
+          return;
+        }
 
         var canvasPetani = document.getElementById('canvasPetaniSign');
         var canvasFf = document.getElementById('canvasFfSign');
@@ -4792,6 +4806,16 @@ function openVerifikasiModal(lahanId) {
           var ctx = canvas.getContext('2d');
           ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
+      }
+
+      function isCanvasBlank(canvasId) {
+        var canvas = document.getElementById(canvasId);
+        if (!canvas) return true;
+        var ctx = canvas.getContext('2d');
+        var pixelBuffer = new Uint32Array(
+          ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+        );
+        return !pixelBuffer.some(function(color) { return color !== 0; });
       }
 
       function togglePasswordVisibility(inputId, btn) {
@@ -5476,16 +5500,25 @@ function openVerifikasiModal(lahanId) {
           Mengetahui: document.getElementById('srtMengetahui').value
         };
 
-        // Sertakan file & canvas hanya jika ada isinya
+        var existingSrt = payload.id ? localStore.serahTerima.find(function(x){ return x.ID_SerahTerima === payload.id; }) : null;
+        if (isCanvasBlank('canvasTtdPic') && !(existingSrt && existingSrt.TTD_PIC)) {
+          showToast('Tanda Tangan PIC wajib diisi.', 'warning');
+          return;
+        }
+        if (isCanvasBlank('canvasTtdPen') && !(existingSrt && existingSrt.TTD_Penerima)) {
+          showToast('Tanda Tangan Penerima wajib diisi.', 'warning');
+          return;
+        }
+        if (isCanvasBlank('canvasTtdSah') && !(existingSrt && existingSrt.TTD_Pengesahan)) {
+          showToast('Tanda Tangan Pengesahan wajib diisi.', 'warning');
+          return;
+        }
+
         var fileB64 = document.getElementById('srtFileBase64').value;
-        var tPic = document.getElementById('canvasTtdPic').toDataURL();
-        var tPen = document.getElementById('canvasTtdPen').toDataURL();
-        var tSah = document.getElementById('canvasTtdSah').toDataURL();
-        
         if (fileB64) payload.Dokumentasi = fileB64;
-        if (tPic.length > 2000) payload.TTD_PIC = tPic; // Asumsi > 2000 artinya canvas digambar
-        if (tPen.length > 2000) payload.TTD_Penerima = tPen;
-        if (tSah.length > 2000) payload.TTD_Pengesahan = tSah;
+        if (!isCanvasBlank('canvasTtdPic')) payload.TTD_PIC = document.getElementById('canvasTtdPic').toDataURL();
+        if (!isCanvasBlank('canvasTtdPen')) payload.TTD_Penerima = document.getElementById('canvasTtdPen').toDataURL();
+        if (!isCanvasBlank('canvasTtdSah')) payload.TTD_Pengesahan = document.getElementById('canvasTtdSah').toDataURL();
 
         var btn = document.getElementById('btnSaveSerah'); btn.innerText = 'Menyimpan...'; btn.disabled = true;
         gasRun('saveSerahTerima', sessionToken, payload).then(function(res) {
