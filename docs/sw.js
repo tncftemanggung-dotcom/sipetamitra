@@ -1,5 +1,5 @@
 /* Service Worker SIPETA MITRA — Versi di-bump setiap update index.html / pwa-config.js */
-const VERSION = 'v5.4.0'; // Diubah agar browser/HP otomatis menghapus cache versi lama
+const VERSION = 'v5.4.1'; // Diubah agar browser/HP otomatis menghapus cache versi lama
 const SHELL_CACHE = 'app-shell-' + VERSION;
 const RUNTIME_CACHE = 'runtime-' + VERSION;
 const PRECACHE = [
