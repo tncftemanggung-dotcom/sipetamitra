@@ -1,8 +1,8 @@
 // api.gs — Router POST untuk jembatan PWA (gas-bridge.js) ke Google Apps Script
-// SIPETA MITRA v5.0 | Pastikan file ini berada di project Apps Script yang sama dengan Code.gs
+// SIPETA MITRA v5.4 | Pastikan file ini berada di project Apps Script yang sama dengan Code.gs
 
 /**
- * Daftar 19 fungsi backend yang diizinkan dipanggil oleh PWA.
+ * Daftar 20 fungsi backend yang diizinkan dipanggil oleh PWA.
  * Fungsi internal & darurat (setupDatabase, hashPassword, uploadBase64ToDrive,
  * resetPasswordAdmin, dll.) sengaja TIDAK dimasukkan demi keamanan.
  */
@@ -33,8 +33,9 @@ function getApiHandlers_() {
     saveSebarBenih: saveSebarBenih,
     savePembibitan: savePembibitan,
 
-    // Profil Pengguna
+    // Profil Pengguna (Foto & Spesimen TTD)
     updateUserProfilePhoto: updateUserProfilePhoto,
+    updateUserSignature: updateUserSignature,
 
     // Administrator (Pengguna, Trader, Penugasan PIC, Jadwal Tanam, Informasi Tambahan)
     saveUser: saveUser,
