@@ -3676,7 +3676,7 @@
                 '<span class="text-xs font-semibold bg-slate-700 px-2 py-1 border border-slate-600 rounded-md text-emerald-300">' + petaniUnderThisKoor.length + ' Petani</span>' +
                 (!isReadOnly && k.status === 'AKTIF' ? 
                   '<button type="button" onclick="window.SIPETA.openPetaniModalWithKoor(\'' + k.id + '\')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm">' +
-                    '<i class="fa-solid fa-user-plus text-[10px]"></i><span class="hidden sm:inline">Daftarkan Petani</span>' +
+                    '<i class="fa-solid fa-user-plus text-[10px]"></i><span class="hidden sm:inline">Tambahkan Petani</span>' +
                   '</button>' : '') +
               '</div>' +
             '</div>';
@@ -3720,8 +3720,10 @@
                 // KONTAINER DAFTAR LAHAN (DIBUAT HIDDEN SEBAGAI DEFAULT)
                 '<div id="lahan-container-' + p.id + '" class="hidden bg-white">';
 
-            // Tabel Lahan Milik Petani
-            if (lahanMilikPetani.length > 0) {
+            // Tabel Lahan Milik Petani (Hanya tampil jika Petani AKTIF)
+            if (p.status !== 'AKTIF') {
+                bodyKoor += '<div class="p-4 text-center text-xs text-rose-500 italic bg-rose-50/40">Daftar lahan disembunyikan karena status petani TIDAK AKTIF. Aktifkan petani terlebih dahulu untuk melihat dan mengelola lahan.</div>';
+            } else if (lahanMilikPetani.length > 0) {
                 bodyKoor += 
                     '<div class="overflow-x-auto">' +
                       '<table class="w-full text-left border-collapse text-xs">' +
