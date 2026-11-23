@@ -449,7 +449,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 id="dashPageTitle" class="text-xl sm:text-2xl font-bold text-slate-900">Ringkasan Operasional</h1>
-              <p id="dashPageSubtitle" class="text-xs sm:text-sm text-slate-500">Status data registrasi mitra dan lahan aktif di cakupan akses Anda</p>
+              <p id="dashPageSubtitle" class="text-xs sm:text-sm text-slate-500">Status data petani dan lahan mitra aktif di cakupan akses Anda</p>
             </div>
             <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
               <select id="filterDashboardView" onchange="window.SIPETA.renderDashboard()" class="text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-500">
@@ -486,7 +486,7 @@
                 </span>
                 <div class="min-w-0">
                   <span class="block text-xs font-bold leading-tight truncate">Verifikasi Lahan</span>
-                  <span class="dash-stage-sub block text-[10px] text-amber-600 font-semibold mt-0.5">On Progress</span>
+                  <span class="dash-stage-sub block text-[10px] text-slate-400 font-semibold mt-0.5">Data Lolos</span>
                 </div>
               </button>
 
@@ -633,12 +633,112 @@
             </div>
 
             <!-- PANEL 2: VERIFIKASI LAHAN -->
-            <div id="dashStage_verif_lahan" class="dash-stage-panel hidden fade-in">
-              <div class="bg-white p-10 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-3">
-                <span class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl"><i class="fa-solid fa-clipboard-check"></i></span>
-                <h3 class="text-base font-bold text-slate-800">Dashboard Verifikasi Lahan</h3>
-                <p class="text-xs text-slate-500 max-w-md">Ringkasan metrik dan grafik tahap Verifikasi Lahan sedang dalam tahap pengembangan.</p>
-                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold uppercase">On Progress</span>
+            <div id="dashStage_verif_lahan" class="dash-stage-panel hidden space-y-4 fade-in">
+              <!-- 4 METRICS CARDS (ANGKA - DATA LOLOS & LUAS VALIDASI) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- 1. Total Koordinator Lolos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Koordinator (Lolos)</span>
+                    <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm"><i class="fa-solid fa-users"></i></span>
+                  </div>
+                  <div class="mt-3 flex items-baseline gap-2">
+                    <span id="dashVlKoorTotal" class="text-2xl font-bold text-slate-900">0</span>
+                    <span class="text-xs text-slate-400">orang</span>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap justify-between gap-1 text-[11px] text-slate-500">
+                    <span>Petani: <strong id="dashVlKoorPetani" class="text-emerald-600">0</strong></span>
+                    <span>Semi Bakul: <strong id="dashVlKoorSemiBakul" class="text-amber-600">0</strong></span>
+                    <span>Bakul: <strong id="dashVlKoorBakul" class="text-blue-600">0</strong></span>
+                  </div>
+                </div>
+
+                <!-- 2. Total Petani Mitra Lolos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Petani Mitra (Lolos)</span>
+                    <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm"><i class="fa-solid fa-person-digging"></i></span>
+                  </div>
+                  <div class="mt-3 flex items-baseline gap-2">
+                    <span id="dashVlPetaniTotal" class="text-2xl font-bold text-slate-900">0</span>
+                    <span class="text-xs text-slate-400">petani</span>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+                    <span>Baru: <strong id="dashVlPetaniBaru" class="text-blue-600">0</strong></span>
+                    <span>Lama: <strong id="dashVlPetaniLama" class="text-slate-700">0</strong></span>
+                  </div>
+                </div>
+
+                <!-- 3. Total Titik/Lahan Lolos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Titik / Lahan (Lolos)</span>
+                    <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm"><i class="fa-solid fa-map-location-dot"></i></span>
+                  </div>
+                  <div class="mt-3 flex items-baseline gap-2">
+                    <span id="dashVlLahanTotal" class="text-2xl font-bold text-slate-900">0</span>
+                    <span class="text-xs text-slate-400">titik</span>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+                    <span>Baru: <strong id="dashVlLahanBaru" class="text-blue-600">0</strong></span>
+                    <span>Lama: <strong id="dashVlLahanLama" class="text-slate-700">0</strong></span>
+                  </div>
+                </div>
+
+                <!-- 4. Total Luas Validasi Lolos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Luas Validasi (Lolos)</span>
+                    <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm"><i class="fa-solid fa-chart-area"></i></span>
+                  </div>
+                  <div class="mt-3 flex items-baseline gap-2">
+                    <span id="dashVlLuasTotal" class="text-2xl font-bold text-emerald-700">0.00</span>
+                    <span class="text-xs text-slate-400">Hektare</span>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+                    <span>Baru: <strong id="dashVlLuasBaru" class="text-blue-600">0.00 Ha</strong></span>
+                    <span>Lama: <strong id="dashVlLuasLama" class="text-slate-700">0.00 Ha</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4 DIAGRAM / CHART CARDS -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Chart 1: Sebaran Klaster Petani (Luas Validasi Dominan) -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-800">Sebaran Klaster Petani (Lolos)</h3>
+                    <p class="text-[11px] text-slate-400">Berdasarkan klaster dengan luas validasi dominan tiap petani</p>
+                  </div>
+                  <div id="chartVlKlasterPetani" class="space-y-3"></div>
+                </div>
+
+                <!-- Chart 2: Sebaran Klaster Lahan (Berdasarkan Luas Validasi) -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-800">Sebaran Klaster Lahan (Lolos)</h3>
+                    <p class="text-[11px] text-slate-400">Berdasarkan proporsi total luas validasi (Ha) per klaster</p>
+                  </div>
+                  <div id="chartVlKlasterLahan" class="space-y-3"></div>
+                </div>
+
+                <!-- Chart 3: Prosentase Lolos / Tidak Lolos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-800">Prosentase Lolos / Tidak Lolos</h3>
+                    <p class="text-[11px] text-slate-400">Perbandingan hasil keputusan verifikasi berdasarkan luas validasi (Ha)</p>
+                  </div>
+                  <div id="chartVlStatusLolos" class="space-y-3"></div>
+                </div>
+
+                <!-- Chart 4: Prosentase Reason Tidak Lolos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-800">Prosentase Reason Tidak Lolos</h3>
+                    <p class="text-[11px] text-slate-400">Distribusi alasan penolakan lahan yang tidak lolos verifikasi</p>
+                  </div>
+                  <div id="chartVlReasonTidakLolos" class="space-y-3"></div>
+                </div>
               </div>
             </div>
 
@@ -3851,6 +3951,133 @@
           { label: 'MIX', value: tkMap['MIX'] || 0, color: 'bg-amber-500' }
         ];
         renderBarChart('chartProfilTenagaKerja', arrTk, petaniAktifList.length, 'Petani');
+
+        // === 1B. DASHBOARD VERIFIKASI LAHAN (DATA LOLOS & LUAS VALIDASI) ===
+        var vlLahanLolos = [];
+        var vlLahanTidakLolos = [];
+        lahanAktifList.forEach(function(l) {
+          var stV = String(l.statusVerifikasi || '').toUpperCase();
+          if (stV === 'LOLOS') vlLahanLolos.push(l);
+          else if (stV === 'TIDAK LOLOS') vlLahanTidakLolos.push(l);
+        });
+
+        var vlPetaniMap = {};
+        var vlLahanBaru = 0, vlLahanLama = 0;
+        var vlLuasTotal = 0, vlLuasBaru = 0, vlLuasLama = 0;
+        var vlKlasterLuasMap = {};
+        var vlPetaniKlasterLuas = {};
+
+        vlLahanLolos.forEach(function(l) {
+          vlPetaniMap[l.petaniId] = true;
+          var luasVal = parseFloat(l.luasValidasi);
+          if (isNaN(luasVal) || luasVal <= 0) luasVal = parseFloat(l.luasHa) || 0;
+
+          vlLuasTotal += luasVal;
+          if (String(l.statusAlas || '').toUpperCase() === 'BARU') {
+            vlLahanBaru++;
+            vlLuasBaru += luasVal;
+          } else {
+            vlLahanLama++;
+            vlLuasLama += luasVal;
+          }
+
+          var klVal = String(l.klasterValidasi || l.klaster || 'LAINNYA').toUpperCase();
+          vlKlasterLuasMap[klVal] = (vlKlasterLuasMap[klVal] || 0) + luasVal;
+
+          if (!vlPetaniKlasterLuas[l.petaniId]) vlPetaniKlasterLuas[l.petaniId] = {};
+          vlPetaniKlasterLuas[l.petaniId][klVal] = (vlPetaniKlasterLuas[l.petaniId][klVal] || 0) + luasVal;
+        });
+
+        var vlPetaniList = petaniAktifList.filter(function(p) { return vlPetaniMap[p.id]; });
+        var vlKoorMap = {};
+        var vlPetaniBaru = 0, vlPetaniLama = 0;
+        vlPetaniList.forEach(function(p) {
+          vlKoorMap[p.koordinatorId] = true;
+          if (String(p.statusPetani || '').toUpperCase() === 'BARU') vlPetaniBaru++; else vlPetaniLama++;
+        });
+
+        var vlKoorList = koorAktifList.filter(function(k) { return vlKoorMap[k.id]; });
+        var vlKoorPetani = 0, vlKoorSemiBakul = 0, vlKoorBakul = 0;
+        vlKoorList.forEach(function(k) {
+          var prof = String(k.profil || '').toUpperCase();
+          if (prof === 'PETANI') vlKoorPetani++;
+          else if (prof === 'SEMI BAKUL') vlKoorSemiBakul++;
+          else if (prof === 'BAKUL') vlKoorBakul++;
+        });
+
+        if (document.getElementById('dashVlKoorTotal')) {
+          document.getElementById('dashVlKoorTotal').textContent = vlKoorList.length;
+          document.getElementById('dashVlKoorPetani').textContent = vlKoorPetani;
+          document.getElementById('dashVlKoorSemiBakul').textContent = vlKoorSemiBakul;
+          document.getElementById('dashVlKoorBakul').textContent = vlKoorBakul;
+
+          document.getElementById('dashVlPetaniTotal').textContent = vlPetaniList.length;
+          document.getElementById('dashVlPetaniBaru').textContent = vlPetaniBaru;
+          document.getElementById('dashVlPetaniLama').textContent = vlPetaniLama;
+
+          document.getElementById('dashVlLahanTotal').textContent = vlLahanLolos.length;
+          document.getElementById('dashVlLahanBaru').textContent = vlLahanBaru;
+          document.getElementById('dashVlLahanLama').textContent = vlLahanLama;
+
+          document.getElementById('dashVlLuasTotal').textContent = vlLuasTotal.toFixed(2);
+          document.getElementById('dashVlLuasBaru').textContent = vlLuasBaru.toFixed(2) + ' Ha';
+          document.getElementById('dashVlLuasLama').textContent = vlLuasLama.toFixed(2) + ' Ha';
+        }
+
+        // Chart VL 1: Klaster Petani (Luas Validasi Dominan)
+        var vlKlasterPetaniCount = {};
+        var vlTotalPetaniDom = 0;
+        vlPetaniList.forEach(function(p) {
+          var mapKl = vlPetaniKlasterLuas[p.id];
+          if (!mapKl) return;
+          var domKl = '';
+          var maxLuas = -1;
+          for (var kName in mapKl) {
+            if (mapKl[kName] > maxLuas) {
+              maxLuas = mapKl[kName];
+              domKl = kName;
+            }
+          }
+          if (domKl) {
+            vlKlasterPetaniCount[domKl] = (vlKlasterPetaniCount[domKl] || 0) + 1;
+            vlTotalPetaniDom++;
+          }
+        });
+        var arrVlKlasterPetani = Object.keys(vlKlasterPetaniCount).map(function(k) {
+          return { label: k, value: vlKlasterPetaniCount[k] };
+        }).sort(function(a, b) { return b.value - a.value; });
+        renderBarChart('chartVlKlasterPetani', arrVlKlasterPetani, vlTotalPetaniDom, 'Petani');
+
+        // Chart VL 2: Klaster Lahan (Berdasarkan Luas Validasi)
+        var arrVlKlasterLahan = Object.keys(vlKlasterLuasMap).map(function(k) {
+          return { label: k, value: vlKlasterLuasMap[k] };
+        }).sort(function(a, b) { return b.value - a.value; });
+        renderBarChart('chartVlKlasterLahan', arrVlKlasterLahan, vlLuasTotal, 'Ha');
+
+        // Chart VL 3: Prosentase Lolos / Tidak Lolos (Berdasarkan Luas Validasi)
+        var vlLuasTidakLolos = 0;
+        vlLahanTidakLolos.forEach(function(l) {
+          var luasVal = parseFloat(l.luasValidasi);
+          if (isNaN(luasVal) || luasVal <= 0) luasVal = parseFloat(l.luasHa) || 0;
+          vlLuasTidakLolos += luasVal;
+        });
+        var totalLuasTerverifikasi = vlLuasTotal + vlLuasTidakLolos;
+        var arrVlStatus = [
+          { label: 'LOLOS', value: vlLuasTotal, color: 'bg-emerald-500' },
+          { label: 'TIDAK LOLOS', value: vlLuasTidakLolos, color: 'bg-rose-500' }
+        ];
+        renderBarChart('chartVlStatusLolos', arrVlStatus, totalLuasTerverifikasi, 'Ha');
+
+        // Chart VL 4: Prosentase Reason Tidak Lolos
+        var reasonMap = {};
+        vlLahanTidakLolos.forEach(function(l) {
+          var rText = String(l.catatanVerifikasi || '').trim().toUpperCase() || 'TANPA CATATAN';
+          reasonMap[rText] = (reasonMap[rText] || 0) + 1;
+        });
+        var arrVlReason = Object.keys(reasonMap).map(function(k) {
+          return { label: k, value: reasonMap[k], color: 'bg-rose-500' };
+        }).sort(function(a, b) { return b.value - a.value; });
+        renderBarChart('chartVlReasonTidakLolos', arrVlReason, vlLahanTidakLolos.length, 'Lahan');
 
         // === 2. KINERJA ORGANISASI (KUNJUNGAN FIELD FORCE PER BULAN) ===
         var lahanLolosSet = {};
