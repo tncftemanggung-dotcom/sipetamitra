@@ -26,6 +26,7 @@ function getApiHandlers_() {
 
     // Stok Benih, Serah Terima & Distribusi Benih
     saveStokOpname: saveStokOpname,
+    deleteStokOpname: deleteStokOpname,
     saveSerahTerima: saveSerahTerima,
     saveDistribusiBenih: saveDistribusiBenih,
 
