@@ -2153,6 +2153,7 @@
               <option value="TEGAL SUMBING">TEGAL SUMBING</option>
               <option value="TOALO">TOALO</option>
               <option value="SAWAH">SAWAH</option>
+              <option value="KIDULAN">KIDULAN</option>
             </select>
           </div>
           <div>
@@ -6202,7 +6203,10 @@ function openVerifikasiModal(lahanId) {
           var hitungBeratAkhir = (parseFloat(o.Berat_Awal) || 0) - hitungTersalur;
           var canEdit = currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'PIC');
           var aksiBtn = canEdit
-            ? '<button onclick="window.SIPETA.editStok(\''+o.ID_Opname+'\')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded"><i class="fa-solid fa-pen"></i></button>'
+            ? '<div class="flex items-center justify-center gap-1.5">' +
+                '<button type="button" onclick="window.SIPETA.editStok(\'' + o.ID_Opname + '\')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Edit"><i class="fa-solid fa-pen"></i></button>' +
+                '<button type="button" data-delete-stok="' + escapeHTML(o.ID_Opname) + '" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded" title="Hapus"><i class="fa-solid fa-trash"></i></button>' +
+              '</div>'
             : '<span class="text-[10px] text-slate-400 italic">View Only</span>';
           
           tb.innerHTML += '<tr class="hover:bg-slate-50 border-b"><td class="p-3">' + escapeHTML(o.Identitas) + '<br><span class="text-[10px] text-slate-400">' + escapeHTML(o.Varietas) + '</span></td><td class="p-3 font-mono text-emerald-700 font-bold">' + escapeHTML(o.Kode_Kemasan) + '</td><td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-100 font-bold">' + escapeHTML(o.Status_Benih) + '</span></td><td class="p-3 font-mono">' + escapeHTML(o.Unique_Code) + '</td><td class="p-3">' + escapeHTML(o.Berat_Awal) + '</td><td class="p-3 font-bold text-amber-600">' + hitungTersalur + '</td><td class="p-3 text-blue-700 font-bold">' + hitungBeratAkhir + '</td><td class="p-3 text-center">' + aksiBtn + '</td></tr>';
@@ -6215,13 +6219,18 @@ function openVerifikasiModal(lahanId) {
          var kVar = mapV[v] || '';
          document.getElementById('soKodeVarietas').value = kVar;
 
+         var isEdit = Boolean(document.getElementById('soId').value);
          var num = document.getElementById('soNomorKemasan').value;
-         if(document.getElementById('modalStokTitle').innerText.indexOf('Tambah') !== -1) {
+         if (!isEdit) {
             if (kVar) {
-               var countByKode = localStore.stokOpname.filter(function(item) {
-                 return item.Kode_Varietas === kVar;
-               }).length;
-               num = countByKode + 1;
+               var maxNum = 0;
+               localStore.stokOpname.forEach(function(item) {
+                 if (item.Kode_Varietas === kVar) {
+                   var n = parseInt(item.Nomor_Kemasan, 10) || 0;
+                   if (n > maxNum) maxNum = n;
+                 }
+               });
+               num = maxNum + 1;
             } else {
                num = '';
             }
@@ -6259,6 +6268,7 @@ function openVerifikasiModal(lahanId) {
       function editStok(id) {
         var o = localStore.stokOpname.find(function(x){return x.ID_Opname === id;});
         if(!o) return;
+        document.getElementById('modalStokTitle').innerText = 'Edit Stok Opname';
         document.getElementById('soId').value = o.ID_Opname;
         document.getElementById('soIdentitas').value = o.Identitas; document.getElementById('soVarietas').value = o.Varietas;
         document.getElementById('soKodeVarietas').value = o.Kode_Varietas; document.getElementById('soNomorKemasan').value = o.Nomor_Kemasan;
@@ -6268,10 +6278,36 @@ function openVerifikasiModal(lahanId) {
         document.getElementById('soUnique').value = o.Unique_Code; document.getElementById('soBeratAwal').value = o.Berat_Awal;
         document.getElementById('soTersalur').value = o.Tersalur;
         document.getElementById('soBeratAkhir').value = o.Berat_Akhir; document.getElementById('soStatus').value = o.Status_Benih;
-        window.SIPETA.calcStokOpname(); // Update perhitungan tersalur terbaru
-        document.getElementById('modalStokTitle').innerText = 'Edit Stok Opname';
+        window.SIPETA.calcStokOpname(); // Update perhitungan tersalur terbaru tanpa mengubah Nomor Kemasan
         document.getElementById('modalStokOpname').classList.remove('hidden');
       }
+
+      function deleteStok(id) {
+        var o = localStore.stokOpname.find(function(x){ return x.ID_Opname === id; });
+        var label = o ? (o.Identitas + ' (' + o.Kode_Kemasan + ')') : id;
+        if (!confirm('Hapus data Stok Opname "' + label + '"? Data yang dihapus tidak dapat dikembalikan.')) return;
+
+        gasRun('deleteStokOpname', sessionToken, id).then(function(res) {
+          if (res.sessionExpired) {
+            handleSessionExpired();
+            return;
+          }
+          if (res.success) {
+            showToast('Data Stok Opname berhasil dihapus.', 'success');
+            loadAllData();
+          } else {
+            showToast(res.message, 'error');
+          }
+        }).catch(function(e) {
+          showToast(e.message, 'error');
+        });
+      }
+
+      document.addEventListener('click', function(e) {
+        var btnDel = e.target.closest('[data-delete-stok]');
+        if (!btnDel) return;
+        deleteStok(btnDel.getAttribute('data-delete-stok'));
+      });
 
       function saveStokOpname() {
         var payload = {
