@@ -4997,6 +4997,16 @@ function openVerifikasiModal(lahanId) {
           return;
         }
 
+        var isDuplicateKodeSeri = (localStore.koordinators || []).some(function(k) {
+          return String(k.traderId) === String(traderId) &&
+            String(k.kodeSeri || '').trim().toUpperCase() === kodeSeri &&
+            k.id !== id;
+        });
+        if (isDuplicateKodeSeri) {
+          showToast('Kode Seri "' + kodeSeri + '" sudah digunakan oleh koordinator lain pada Trader ini.', 'warning');
+          return;
+        }
+
         // Pertahankan PIC jika ini mode Edit, buat PIC dari login jika mode Tambah
         var picValue = "-";
         if (id) {
