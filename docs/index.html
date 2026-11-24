@@ -50,6 +50,23 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+    /* Custom Scrollbar khusus Sidebar Menu (Dark Theme - Selalu Tampil) */
+    #sidebarNavList {
+      overflow-y: scroll !important;
+    }
+    #sidebarNavList::-webkit-scrollbar {
+      width: 8px;
+    }
+    #sidebarNavList::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    #sidebarNavList::-webkit-scrollbar-thumb {
+      background: #64748b;
+      border-radius: 9999px;
+    }
+    #sidebarNavList::-webkit-scrollbar-thumb:hover {
+      background: #10b981;
+    }
     .fade-in {
       animation: fadeIn 0.2s ease-in-out;
     }
@@ -143,7 +160,7 @@
   </div>
 
   <!-- ==================== VIEW 2: APP SHELL (NAVBAR + SIDEBAR + CONTENT) ==================== -->
-  <div id="viewApp" class="flex-1 flex flex-col hidden h-screen overflow-hidden">
+  <div id="viewApp" class="flex flex-col hidden h-screen max-h-screen overflow-hidden">
     <!-- TOP NAVBAR (HANYA MUNCUL DI DESKTOP/TABLET) -->
     <header class="hidden lg:flex bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-3 items-center justify-between">
       <div class="flex items-center gap-3">
@@ -191,11 +208,11 @@
       </div>
     </header>
 
-    <div class="flex-1 flex overflow-hidden relative">
+    <div class="flex-1 flex min-h-0 overflow-hidden relative">
       <!-- SIDEBAR NAVIGATION (HANYA DESKTOP) -->
-      <aside id="appSidebar" class="hidden lg:flex w-64 bg-slate-900 text-slate-300 flex-col z-20">
+      <aside id="appSidebar" class="hidden lg:flex w-64 h-full min-h-0 overflow-hidden bg-slate-900 text-slate-300 flex-col z-20">
         <!-- Menu Navigation Items -->
-        <nav class="flex-1 overflow-y-auto p-4 space-y-1.5 text-sm" id="sidebarNavList">
+        <nav class="flex-1 min-h-0 overflow-y-scroll p-4 space-y-1.5 text-sm" id="sidebarNavList">
           <button type="button" onclick="window.SIPETA.showPage('beranda')" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-left font-medium" data-page="beranda">
             <i class="fa-solid fa-house w-5 text-center"></i>
             <span>Beranda</span>
@@ -3457,33 +3474,19 @@
               dst[k] = src[k];
             });
           }
-          var overlayMap = {
-            savePetani: { key: 'petani', idField: 'id', defaultStatus: true },
-            saveLahan: { key: 'lahan', idField: 'id', defaultStatus: true },
-            saveVerifikasiLahan: { key: 'lahan', idField: 'id', defaultStatus: false },
-            saveKoordinator: { key: 'koordinators', idField: 'id', defaultStatus: true },
-            saveStokOpname: { key: 'stokOpname', idField: 'ID_Opname', defaultStatus: false },
-            saveSerahTerima: { key: 'serahTerima', idField: 'ID_SerahTerima', defaultStatus: false },
-            saveDistribusiBenih: { key: 'distribusiBenih', idField: 'ID_Distribusi', defaultStatus: false },
-            saveSebarBenih: { key: 'sebarBenih', idField: 'ID_Sebar', defaultStatus: false, addTimestamp: true },
-            savePembibitan: { key: 'pembibitan', idField: 'ID_Pembibitan', defaultStatus: false, addTimestamp: true }
-          };
           pending.forEach(function(it) {
             var pl = (it.args && it.args[1]) || {};
-            var cfg = overlayMap[it.fn];
-            if (cfg) {
-              if (!Array.isArray(d[cfg.key])) d[cfg.key] = [];
-              var list = d[cfg.key];
-              var row = pl.id ? list.filter(function(x) { return x[cfg.idField] === pl.id; })[0] : null;
+            var list = it.fn === 'savePetani' ? d.petani : (it.fn === 'saveLahan' || it.fn === 'saveVerifikasiLahan') ? d.lahan : it.fn === 'saveKoordinator' ? d.koordinators : null;
+            if (list) {
+              var row = pl.id ? list.filter(function(x) { return x.id === pl.id; })[0] : null;
               if (row) {
                 copyInto(row, pl, false);
               } else if (!pl.id && pl._tmpId) {
                 var n = {};
                 copyInto(n, pl, false);
-                n[cfg.idField] = pl._tmpId;
+                n.id = pl._tmpId;
                 n._pending = true;
-                if (cfg.defaultStatus && !n.status) n.status = 'AKTIF';
-                if (cfg.addTimestamp && !n.Timestamp) n.Timestamp = new Date(it.createdAt || Date.now()).toISOString().slice(0, 10);
+                if (!n.status) n.status = 'AKTIF';
                 list.push(n);
               }
             } else if (it.fn === 'toggleStatusEntity') {
@@ -3516,20 +3519,9 @@
 
       function describePending(it) {
         var pl = (it.args && it.args[1]) || {};
-        var names = {
-          savePetani: 'Petani',
-          saveLahan: 'Lahan',
-          saveKoordinator: 'Koordinator',
-          toggleStatusEntity: 'Ubah status',
-          saveVerifikasiLahan: 'Verifikasi lahan',
-          saveStokOpname: 'Stok Opname',
-          saveSerahTerima: 'Serah Terima',
-          saveDistribusiBenih: 'Distribusi Benih',
-          saveSebarBenih: 'Sebar Benih',
-          savePembibitan: 'Pembibitan'
-        };
+        var names = { savePetani: 'Petani', saveLahan: 'Lahan', saveKoordinator: 'Koordinator', toggleStatusEntity: 'Ubah status', saveVerifikasiLahan: 'Verifikasi lahan' };
         var label = names[it.fn] || it.fn;
-        var what = pl.nama || pl.aliasLahan || pl.Nama_Petani || pl.Identitas || pl.Label_Kemasan || (it.fn === 'saveVerifikasiLahan' ? (localStore.lahan.filter(function(x) { return x.id === pl.id; })[0] || {}).kodeLahan : '') || pl.id || '';
+        var what = pl.nama || pl.aliasLahan || (it.fn === 'saveVerifikasiLahan' ? (localStore.lahan.filter(function(x) { return x.id === pl.id; })[0] || {}).kodeLahan : '') || pl.id || '';
         var kind = it.fn === 'saveVerifikasiLahan' ? '' : it.fn === 'toggleStatusEntity' ? (' → ' + (pl.newStatus || '')) : (pl.id && !TMP_RE.test(pl.id) ? ' (ubah)' : ' (baru)');
         return label + kind + (what ? ': ' + what : '');
       }
@@ -5689,7 +5681,7 @@ function openVerifikasiModal(lahanId) {
 
       function togglePopup(popupId) {
         // Tutup popup lain terlebih dahulu
-        var allPopups = ['popupRegMobile', 'popupVerifMobile', 'popupGapMobile', 'popupStokMobile', 'popupAdminMobile'];
+        var allPopups = ['popupRegMobile', 'popupVerifMobile', 'popupGapMobile', 'popupStokMobile'];
         allPopups.forEach(function(id) {
           if (id !== popupId) {
             var p = document.getElementById(id);
@@ -6282,11 +6274,9 @@ function openVerifikasiModal(lahanId) {
           Berat_Akhir: document.getElementById('soBeratAkhir').value, Status_Benih: document.getElementById('soStatus').value
         };
         var btn = document.getElementById('btnSaveStok'); btn.innerText = 'Menyimpan...'; btn.disabled = true;
-        if (!payload.id) payload._tmpId = newTmpId();
         gasRun('saveStokOpname', sessionToken, payload).then(function(res) {
           btn.innerText = 'Simpan Stok'; btn.disabled = false;
-          if (res.sessionExpired) { handleSessionExpired(); return; }
-          if(res.success) { showToast(res.queued ? OFFLINE_SAVED_MSG : 'Stok Opname tersimpan', 'success'); closeModal('modalStokOpname'); loadAllData(); }
+          if(res.success) { showToast('Stok Opname tersimpan', 'success'); closeModal('modalStokOpname'); loadAllData(); }
           else showToast(res.message, 'error');
         }).catch(function(e){ btn.innerText='Simpan Stok'; btn.disabled=false; showToast(e.message, 'error'); });
       }
@@ -6386,11 +6376,9 @@ function openVerifikasiModal(lahanId) {
         if (!isCanvasBlank('canvasTtdSah')) payload.TTD_Pengesahan = document.getElementById('canvasTtdSah').toDataURL();
 
         var btn = document.getElementById('btnSaveSerah'); btn.innerText = 'Menyimpan...'; btn.disabled = true;
-        if (!payload.id) payload._tmpId = newTmpId();
         gasRun('saveSerahTerima', sessionToken, payload).then(function(res) {
           btn.innerText = 'Simpan Serah Terima'; btn.disabled = false;
-          if (res.sessionExpired) { handleSessionExpired(); return; }
-          if(res.success) { showToast(res.queued ? OFFLINE_SAVED_MSG : 'Serah Terima tersimpan', 'success'); closeModal('modalSerahTerima'); loadAllData(); }
+          if(res.success) { showToast('Serah Terima tersimpan', 'success'); closeModal('modalSerahTerima'); loadAllData(); }
           else showToast(res.message, 'error');
         }).catch(function(e){ btn.innerText='Simpan Serah Terima'; btn.disabled=false; showToast(e.message, 'error'); });
       }
@@ -6677,12 +6665,11 @@ function openVerifikasiModal(lahanId) {
 
         var btn = document.getElementById('btnSaveDist');
         btn.innerText = 'Menyimpan...'; btn.disabled = true;
-        if (!payload.id) payload._tmpId = newTmpId();
         gasRun('saveDistribusiBenih', sessionToken, payload).then(function(res) {
           btn.innerText = 'Simpan Distribusi'; btn.disabled = false;
           if (res.sessionExpired) { handleSessionExpired(); return; }
           if (res.success) {
-            showToast(res.queued ? OFFLINE_SAVED_MSG : 'Data Distribusi Benih berhasil disimpan.', 'success');
+            showToast('Data Distribusi Benih berhasil disimpan.', 'success');
             closeModal('modalDistribusiBenih');
             loadAllData();
           } else {
@@ -7174,13 +7161,12 @@ function openVerifikasiModal(lahanId) {
         btn.disabled = true;
         btn.innerText = 'Menyimpan...';
 
-        if (!payload.id) payload._tmpId = newTmpId();
         gasRun('saveSebarBenih', sessionToken, payload).then(function(res) {
           btn.disabled = false;
           btn.innerText = 'Simpan Sebar Benih';
           if (res.sessionExpired) { handleSessionExpired(); return; }
           if (res.success) {
-            showToast(res.queued ? OFFLINE_SAVED_MSG : 'Data Sebar Benih berhasil disimpan.', 'success');
+            showToast('Data Sebar Benih berhasil disimpan.', 'success');
             closeModal('modalSebarBenih');
             loadAllData();
           } else {
@@ -7490,13 +7476,12 @@ function openVerifikasiModal(lahanId) {
         btn.disabled = true;
         btn.innerText = 'Menyimpan...';
 
-        if (!payload.id) payload._tmpId = newTmpId();
         gasRun('savePembibitan', sessionToken, payload).then(function(res) {
           btn.disabled = false;
           btn.innerText = 'Simpan Pembibitan';
           if (res.sessionExpired) { handleSessionExpired(); return; }
           if (res.success) {
-            showToast(res.queued ? OFFLINE_SAVED_MSG : 'Data Pembibitan berhasil disimpan.', 'success');
+            showToast('Data Pembibitan berhasil disimpan.', 'success');
             closeModal('modalPembibitan');
             loadAllData();
           } else {
