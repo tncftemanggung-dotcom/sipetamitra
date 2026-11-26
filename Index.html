@@ -7155,24 +7155,50 @@ function openVerifikasiModal(lahanId) {
           return;
         }
         var btn = document.getElementById('btnGetSebarLoc');
+        var inputLoc = document.getElementById('sebarTagLokasi');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Mencari...</span>';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Mencari GPS...</span>';
 
+        function applyCoords(pos) {
+          var lat = pos.coords.latitude.toFixed(6);
+          var lng = pos.coords.longitude.toFixed(6);
+          inputLoc.value = lat + ', ' + lng;
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> <span>Ambil Lokasi</span>';
+          showToast('Koordinat lokasi berhasil diambil.', 'success');
+        }
+
+        function handleGeoError(err) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> <span>Ambil Lokasi</span>';
+          var msg = 'Gagal mengambil lokasi.';
+          if (err.code === 1) {
+            msg = 'Izin lokasi ditolak. Aktifkan izin Lokasi/GPS di pengaturan browser HP Anda.';
+          } else if (err.code === 2) {
+            msg = 'Sinyal GPS tidak tersedia. Pastikan GPS/Lokasi HP aktif.';
+          } else if (err.code === 3) {
+            msg = 'Waktu pencarian GPS habis. Coba tekan Ambil Lokasi lagi atau isi manual.';
+          }
+          showToast(msg, 'error');
+        }
+
+        // Percobaan 1: Akurasi tinggi (GPS satelit) dengan batas waktu 15 detik
         navigator.geolocation.getCurrentPosition(
-          function(pos) {
-            var lat = pos.coords.latitude.toFixed(6);
-            var lng = pos.coords.longitude.toFixed(6);
-            document.getElementById('sebarTagLokasi').value = lat + ', ' + lng;
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> <span>Ambil Lokasi</span>';
-            showToast('Koordinat lokasi berhasil diambil.', 'success');
-          },
+          applyCoords,
           function(err) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> <span>Ambil Lokasi</span>';
-            showToast('Gagal mengambil lokasi: ' + err.message, 'error');
+            // Jika timeout atau posisi tidak tersedia, otomatis fallback ke jaringan/Wi-Fi/BTS
+            if (err.code === 2 || err.code === 3) {
+              btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Mencari Jaringan...</span>';
+              navigator.geolocation.getCurrentPosition(
+                applyCoords,
+                handleGeoError,
+                { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
+              );
+            } else {
+              handleGeoError(err);
+            }
           },
-          { enableHighAccuracy: true, timeout: 10000 }
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
         );
       }
 
