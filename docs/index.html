@@ -6958,12 +6958,24 @@ function openVerifikasiModal(lahanId) {
             ? '<button type="button" onclick="window.SIPETA.editSebar(\'' + s.ID_Sebar + '\')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Edit"><i class="fa-solid fa-pen"></i></button>'
             : '<span class="text-[10px] text-slate-400 italic">View Only</span>';
 
+          // Pastikan Luas mutlak angka desimal (bukan string tanggal dari Google Sheets)
+          var rawLuas = String(s.Luas || '').trim();
+          var luasText = '-';
+          if (rawLuas && rawLuas.indexOf(':') === -1 && !isNaN(parseFloat(rawLuas))) {
+            luasText = parseFloat(rawLuas).toFixed(2) + ' Ha';
+          } else if (rawLuas.indexOf(':') !== -1) {
+            // Jika terlanjur jadi tanggal di sheet, hitung ulang dari data lahan aktif petani
+            var pLahan = (localStore.lahan || []).filter(function(l) { return l.petaniId === s.Petani_ID && l.status === 'AKTIF'; });
+            var sumL = pLahan.reduce(function(acc, cur) { return acc + (parseFloat(cur.luasHa) || 0); }, 0);
+            luasText = sumL > 0 ? sumL.toFixed(2) + ' Ha' : '0.00 Ha';
+          }
+
           tb.innerHTML +=
             '<tr class="hover:bg-slate-50 border-b">' +
               '<td class="p-3 font-medium">' + escapeHTML(s.Tanggal_Sebar ? String(s.Tanggal_Sebar).slice(0, 10) : '-') + '<br><span class="text-[10px] text-emerald-700 font-bold">' + escapeHTML(s.Periode_Sebar || '-') + '</span></td>' +
               '<td class="p-3 font-bold text-slate-700">' + escapeHTML(s.Trader) + '<br><span class="text-[10px] text-slate-400 font-normal">' + escapeHTML(s.Field_Force) + '</span></td>' +
               '<td class="p-3 font-semibold text-slate-800">' + escapeHTML(s.Petani_ID) + ' - ' + escapeHTML(s.Nama_Petani) + '<br><span class="text-[10px] text-slate-400">Koor: ' + escapeHTML(s.Nama_Koordinator) + '</span></td>' +
-              '<td class="p-3 font-mono font-bold text-emerald-700">' + escapeHTML(s.Luas) + ' Ha<br><span class="text-[10px] font-sans text-slate-500 font-normal">' + escapeHTML(s.Klaster) + '</span></td>' +
+              '<td class="p-3 font-mono font-bold text-emerald-700">' + luasText + '<br><span class="text-[10px] font-sans text-slate-500 font-normal">' + escapeHTML(s.Klaster) + '</span></td>' +
               '<td class="p-3 text-center">' + badgeStatus + '</td>' +
               '<td class="p-3">' + escapeHTML(s.Varietas || '-') + '<br><span class="text-[10px] font-mono text-blue-700 font-bold">' + (s.Luas_Media_Sebar_m2 ? escapeHTML(s.Luas_Media_Sebar_m2) + ' m&sup2;' : '-') + '</span></td>' +
               '<td class="p-3">' + locHtml + fotoHtml + '</td>' +
